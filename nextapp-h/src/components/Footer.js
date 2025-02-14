@@ -12,9 +12,10 @@ const Footer = () => {
           </Link>
         </div>
 
-        {/* Second Column: Links */}
+        {/* Second Column: Links in a Column */}
         <div>
-          <ul className="flex space-x-8">
+<h3>Site map</h3>
+          <ul className="flex flex-col space-y-4"> {/* Changed to flex-col and added space-y-4 for vertical spacing */}
             <li>
               <Link href="/">
                 <span className="text-white hover:text-blue-500 cursor-pointer">Home</span>
