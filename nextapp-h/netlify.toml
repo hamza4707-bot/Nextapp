@@ -1,9 +1,14 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = ".next"  
   functions = "netlify/functions"
 
-[build.processing]
-  skip_processing = true
+# Use Next.js plugin for proper SSR and API routes
 [[plugins]]
-package = "@netlify/plugin-nextjs"
+  package = "@netlify/plugin-nextjs"
+
+# Optional: Redirect everything to Next.js routing system
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200
