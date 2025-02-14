@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import Menu from '../components/Menu'; 
+import Footer from '../components/Footer';
 import DatePicker from 'react-datepicker'; 
 import "react-datepicker/dist/react-datepicker.css"; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -233,6 +234,7 @@ const clearDateRange = () => {
           ))}
         </div>
       </div>
+            <Footer />
     </div>
   );
 };
