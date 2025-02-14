@@ -35,7 +35,7 @@ export default function AdminPanel() {
     if (!title || !description || !content) return alert("All fields are required!");
 
     setUploading(true);
-    let imageUrl = editing?.image_url || "";
+    let imageUrl = editing?.image || ""; // ✅ Using 'image' instead of 'image_url'
 
     // 📤 Upload image if selected
     if (image) {
@@ -56,10 +56,10 @@ export default function AdminPanel() {
     if (editing) {
       await supabase
         .from(table)
-        .update({ title, description, content, image_url: imageUrl })
+        .update({ title, description, content, image: imageUrl }) // ✅ Using 'image'
         .eq("id", editing.id);
     } else {
-      await supabase.from(table).insert([{ title, description, content, image_url: imageUrl }]);
+      await supabase.from(table).insert([{ title, description, content, image: imageUrl }]); // ✅ Using 'image'
     }
 
     setUploading(false);
@@ -133,7 +133,7 @@ export default function AdminPanel() {
             {(selectedTab === "posts" ? posts : events).map((item) => (
               <li key={item.id} className="flex items-center justify-between bg-white p-3 rounded shadow">
                 <div className="flex items-center gap-3">
-                  {item.image_url && <img src={item.image_url} alt="" className="w-12 h-12 rounded" />}
+                  {item.image && <img src={item.image} alt="" className="w-12 h-12 rounded" />}
                   <div>
                     <h3 className="font-bold">{item.title}</h3>
                     <p className="text-sm">{item.description}</p>
