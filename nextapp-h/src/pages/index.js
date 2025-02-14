@@ -111,7 +111,7 @@ const clearDateRange = () => {
     <div>
       <Menu /> {/* Include the Menu Component */}
       
-      <div className="container mx-auto mt-5 px-4 " style={{width:"100% !important",margin:"auto !important"}} >
+      <div className="container mx-auto mt-5 px-4 " >
         <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
           Looking for a new adventure this weekend in Orange County, California?
         </h1>
@@ -209,7 +209,7 @@ const clearDateRange = () => {
         </div>
 
         {/* Grid of Filtered Articles */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center" style={{margin:'auto', width: '90%'}}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center" >
           {filteredArticles.map((article) => (
             <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               {/* Image */}
