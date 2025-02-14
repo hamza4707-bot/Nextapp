@@ -109,10 +109,10 @@ const clearDateRange = () => {
   };
 
   return (
-    <div className="  w-full  items-center">
+    <div className="">
       <Menu /> {/* Include the Menu Component */}
       
-      <div className="container mx-auto mt-30 px-2 ml-5 sm:max-w-full  " >
+      <div className="container mx-auto mt-30 px-2 ml-5   " >
         <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
           Looking for a new adventure this weekend in Orange County, California?
         </h1>
