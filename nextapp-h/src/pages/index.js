@@ -109,7 +109,7 @@ const clearDateRange = () => {
   };
 
   return (
-    <div style={{Width:'100%'}}>
+    <div className="w-screen">
       <Menu /> {/* Include the Menu Component */}
       
       <div className="container mx-auto mt-5 px-2 " >
