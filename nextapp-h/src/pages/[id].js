@@ -23,6 +23,7 @@ const PostPage = ({ post }) => {
       <h1 className="text-4xl font-bold text-black">{post.title}</h1>
       <img src={post.image} alt={post.title} className="w-full h-96 object-cover my-4" />
       <p className="text-gray-600">{post.description}</p>
+      {/* ✅ Display Full Blog Content */}
       <div className="mt-4 text-gray-800">{post.content}</div>
     </div>
   );
