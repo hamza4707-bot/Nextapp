@@ -35,12 +35,14 @@ export default function AdminPanel() {
     if (!title || !description || !content) return alert("All fields are required!");
 
     setUploading(true);
-    let imageUrl = editing?.image || ""; // ✅ Using 'image' instead of 'image_url'
+    let imageUrl = editing?.image || "";
 
     // 📤 Upload image if selected
     if (image) {
-      const fileName = `${Date.now()}-${image.name}`;
-      const { data, error } = await supabase.storage.from("images").upload(`posts/${fileName}`, image);
+      const fileExtension = image.name.split('.').pop(); // Get file extension
+      const fileName = `${Date.now()}.${fileExtension}`; // Unique filename
+
+      const { error } = await supabase.storage.from("images").upload(`posts/${fileName}`, image);
 
       if (error) {
         alert("Image upload failed");
@@ -48,18 +50,17 @@ export default function AdminPanel() {
         return;
       }
 
-      imageUrl = supabase.storage.from("images").getPublicUrl(`posts/${fileName}`).data.publicUrl;
+      // ✅ Get Public URL and clean it
+      const { data } = supabase.storage.from("images").getPublicUrl(`posts/${fileName}`);
+      imageUrl = data.publicUrl.split("?")[0]; // Remove extra query params
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
 
     if (editing) {
-      await supabase
-        .from(table)
-        .update({ title, description, content, image: imageUrl }) // ✅ Using 'image'
-        .eq("id", editing.id);
+      await supabase.from(table).update({ title, description, content, image: imageUrl }).eq("id", editing.id);
     } else {
-      await supabase.from(table).insert([{ title, description, content, image: imageUrl }]); // ✅ Using 'image'
+      await supabase.from(table).insert([{ title, description, content, image: imageUrl }]);
     }
 
     setUploading(false);
@@ -133,7 +134,7 @@ export default function AdminPanel() {
             {(selectedTab === "posts" ? posts : events).map((item) => (
               <li key={item.id} className="flex items-center justify-between bg-white p-3 rounded shadow">
                 <div className="flex items-center gap-3">
-                  {item.image && <img src={item.image} alt="" className="w-12 h-12 rounded" />}
+                  {item.image && <img src={item.image} alt={item.title} className="w-12 h-12 rounded" />}
                   <div>
                     <h3 className="font-bold">{item.title}</h3>
                     <p className="text-sm">{item.description}</p>
