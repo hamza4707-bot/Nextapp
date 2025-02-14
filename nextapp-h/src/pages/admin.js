@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase"; // ✅ Correct import
+
 export default function AdminPanel() {
   const [posts, setPosts] = useState([]);
   const [events, setEvents] = useState([]);
@@ -7,9 +8,12 @@ export default function AdminPanel() {
   const [selectedTab, setSelectedTab] = useState("posts");
   const [editing, setEditing] = useState(null);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
+  // 🔄 Fetch posts & events from Supabase
   useEffect(() => {
     async function fetchData() {
       let { data: postsData, error: postsError } = await supabase.from("posts").select("*");
@@ -22,18 +26,21 @@ export default function AdminPanel() {
     fetchData();
   }, []);
 
+  // 📸 Handle image file selection
   const handleImageChange = (e) => setImage(e.target.files[0]);
 
+  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title) return alert("Title is required");
+    if (!title || !description || !content) return alert("All fields are required!");
 
     setUploading(true);
     let imageUrl = editing?.image_url || "";
 
+    // 📤 Upload image if selected
     if (image) {
       const fileName = `${Date.now()}-${image.name}`;
-      const { error } = await supabase.storage.from("images").upload(`posts/${fileName}`, image);
+      const { data, error } = await supabase.storage.from("images").upload(`posts/${fileName}`, image);
 
       if (error) {
         alert("Image upload failed");
@@ -45,23 +52,36 @@ export default function AdminPanel() {
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
+
     if (editing) {
-      await supabase.from(table).update({ title, image_url: imageUrl }).eq("id", editing.id);
+      await supabase
+        .from(table)
+        .update({ title, description, content, image_url: imageUrl })
+        .eq("id", editing.id);
     } else {
-      await supabase.from(table).insert([{ title, image_url: imageUrl }]);
+      await supabase.from(table).insert([{ title, description, content, image_url: imageUrl }]);
     }
 
     setUploading(false);
     setTitle("");
+    setDescription("");
+    setContent("");
     setImage(null);
     setEditing(null);
-    window.location.reload();
+
+    // ✅ Fetch updated data without reloading
+    const { data: updatedData } = await supabase.from(table).select("*");
+    selectedTab === "posts" ? setPosts(updatedData) : setEvents(updatedData);
   };
 
+  // ❌ Handle delete
   const handleDelete = async (id) => {
     const table = selectedTab === "posts" ? "posts" : "events";
     await supabase.from(table).delete().eq("id", id);
-    window.location.reload();
+
+    // ✅ Fetch updated data after deletion
+    const { data: updatedData } = await supabase.from(table).select("*");
+    selectedTab === "posts" ? setPosts(updatedData) : setEvents(updatedData);
   };
 
   return (
@@ -85,8 +105,16 @@ export default function AdminPanel() {
         <form onSubmit={handleSubmit} className="mb-5 bg-gray-100 p-4 rounded">
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
             className="w-full p-2 border rounded mb-3" />
+
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"
+            className="w-full p-2 border rounded mb-3"></textarea>
+
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Content"
+            className="w-full p-2 border rounded mb-3"></textarea>
+
           <input type="file" accept="image/*" onChange={handleImageChange}
             className="w-full p-2 border rounded mb-3" />
+
           <button type="submit" disabled={uploading}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             {uploading ? "Saving..." : editing ? "Update" : "Create"}
@@ -106,10 +134,13 @@ export default function AdminPanel() {
               <li key={item.id} className="flex items-center justify-between bg-white p-3 rounded shadow">
                 <div className="flex items-center gap-3">
                   {item.image_url && <img src={item.image_url} alt="" className="w-12 h-12 rounded" />}
-                  <span>{item.title}</span>
+                  <div>
+                    <h3 className="font-bold">{item.title}</h3>
+                    <p className="text-sm">{item.description}</p>
+                  </div>
                 </div>
                 <div>
-                  <button onClick={() => { setEditing(item); setTitle(item.title); }}
+                  <button onClick={() => { setEditing(item); setTitle(item.title); setDescription(item.description); setContent(item.content); }}
                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 mr-2">
                     Edit
                   </button>
