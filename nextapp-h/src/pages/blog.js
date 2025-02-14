@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export async function getServerSideProps() {
   const { data: posts, error } = await supabase
-    .from("posts")
+    .from("Bposts")
     .select("id, title, image, description, created_at")
     .order("created_at", { ascending: false });
 
