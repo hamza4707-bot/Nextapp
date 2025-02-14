@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Menu = () => {
   return (
-    <nav className="bg-white p-4 mb-6">
+    <nav className="bg-white p-4 mb-6 w-full">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-black text-2xl font-bold">
           <Link href="/">
