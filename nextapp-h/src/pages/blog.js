@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export async function getServerSideProps() {
   const { data: posts, error } = await supabase
-    .from("Bposts")
+    .from("posts") // Make sure this matches your table name
     .select("id, title, image, description, created_at")
     .order("created_at", { ascending: false });
 
@@ -21,20 +21,24 @@ const Blog = ({ posts }) => {
   return (
     <div className="container mx-auto mt-5 px-4">
       <h1 className="text-4xl font-bold mb-8 text-black">Blog</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
-            <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
-            <div className="p-4">
-              <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
-              <p className="text-gray-600">{post.description}</p>
-              <Link href={`/blog/${post.id}`} className="text-blue-500 mt-2 block">
-                Read More →
-              </Link>
+      {posts.length === 0 ? (
+        <p className="text-gray-500">No posts found.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
+              <div className="p-4">
+                <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
+                <p className="text-gray-600">{post.description}</p>
+                <Link href={`/blog/${post.id}`} className="text-blue-500 mt-2 block">
+                  Read More →
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
