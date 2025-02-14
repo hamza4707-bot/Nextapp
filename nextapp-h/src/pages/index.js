@@ -109,7 +109,7 @@ const clearDateRange = () => {
   };
 
   return (
-    <div className="mt-15">
+    <div className="mt-15 container w-full mx-auto flex justify-between items-center">
       <Menu /> {/* Include the Menu Component */}
       
       <div className="container mx-auto mt-30 px-2 ml-5 " >
