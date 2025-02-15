@@ -1,18 +1,17 @@
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/router";
 
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
-  // Fetch the event details from Supabase
-  const { data: event, error } = await supabase
-    .from("events")
-    .select("id, title, image, content, created_at")
-    .eq("id", id)
-    .single();
+  // Fetch all events from your API
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/searchTravel`);
+  const events = await res.json();
 
-  if (error || !event) {
-    console.error("Error fetching event:", error);
+  // Find the specific event by ID
+  const event = events.find((event) => event.id === id);
+
+  // If no event is found, return a 404 page
+  if (!event) {
     return { notFound: true };
   }
 
