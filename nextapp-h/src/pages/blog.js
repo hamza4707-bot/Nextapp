@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-
+import Menu from '../components/Menu'; 
+import Footer from '../components/Footer';
 export async function getServerSideProps() {
   const { data: posts, error } = await supabase
     .from("posts")
@@ -19,6 +20,7 @@ export async function getServerSideProps() {
 
 const Blog = ({ posts }) => {
   return (
+<Menu />
     <div className="container mx-auto mt-5 px-4">
       <h1 className="text-4xl font-bold mb-8 text-black">Blog</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -37,6 +39,7 @@ const Blog = ({ posts }) => {
         ))}
       </div>
     </div>
+<Footer />
   );
 };
 
