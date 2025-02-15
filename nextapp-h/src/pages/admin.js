@@ -7,6 +7,8 @@ export default function AdminPanel() {
   const [selectedTab, setSelectedTab] = useState("posts");
   const [editing, setEditing] = useState(null);
   const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
@@ -31,7 +33,9 @@ export default function AdminPanel() {
   // ✅ Handle Add/Edit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !description || !content) return alert("All fields are required!");
+    if (!title || !description || !content || (selectedTab === "events" && (!location || !date))) {
+      return alert("All fields are required!");
+    }
 
     setUploading(true);
     let imageUrl = editing?.image || "";
@@ -53,15 +57,23 @@ export default function AdminPanel() {
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
+    const dataToInsert = { title, description, content, image: imageUrl };
+
+    if (selectedTab === "events") {
+      dataToInsert.location = location;
+      dataToInsert.date = date;
+    }
 
     if (editing) {
-      await supabase.from(table).update({ title, description, content, image: imageUrl }).eq("id", editing.id);
+      await supabase.from(table).update(dataToInsert).eq("id", editing.id);
     } else {
-      await supabase.from(table).insert([{ title, description, content, image: imageUrl }]);
+      await supabase.from(table).insert([dataToInsert]);
     }
 
     setUploading(false);
     setTitle("");
+    setLocation("");
+    setDate("");
     setDescription("");
     setContent("");
     setImage(null);
@@ -104,6 +116,16 @@ export default function AdminPanel() {
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
             className="w-full p-2 border rounded mb-3" />
 
+          {selectedTab === "events" && (
+            <>
+              <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location"
+                className="w-full p-2 border rounded mb-3" />
+
+              <input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)}
+                className="w-full p-2 border rounded mb-3" />
+            </>
+          )}
+
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"
             className="w-full p-2 border rounded mb-3"></textarea>
 
@@ -134,11 +156,11 @@ export default function AdminPanel() {
                   {item.image && <img src={item.image} alt={item.title} className="w-12 h-12 rounded" />}
                   <div>
                     <h3 className="font-bold">{item.title}</h3>
-                    <p className="text-sm">{item.description}</p>
+                    {selectedTab === "events" && <p className="text-sm">{item.location} - {new Date(item.date).toLocaleDateString()}</p>}
                   </div>
                 </div>
                 <div>
-                  <button onClick={() => { setEditing(item); setTitle(item.title); setDescription(item.description); setContent(item.content); }}
+                  <button onClick={() => { setEditing(item); setTitle(item.title); setLocation(item.location); setDate(item.date); setDescription(item.description); setContent(item.content); }}
                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 mr-2">
                     Edit
                   </button>
