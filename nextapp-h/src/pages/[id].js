@@ -1,30 +1,51 @@
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/router";
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ params, resolvedUrl }) {
+  // Detect whether the request is for a blog post or an event
+  const isEvent = resolvedUrl.startsWith("/event/");
+  const table = isEvent ? "events" : "posts";
+
+  // Fetch data from the correct table
   const { data: post, error } = await supabase
-    .from("posts")
+    .from(table)
     .select("id, title, image, description, content, created_at")
     .eq("id", params.id)
     .single();
 
   if (error || !post) {
-    console.error("Error fetching post:", error);
+    console.error(`Error fetching from ${table}:`, error);
     return { notFound: true };
   }
 
   return {
-    props: { post },
+    props: { post, type: isEvent ? "event" : "blog" },
   };
 }
 
-const PostPage = ({ post }) => {
+const PostPage = ({ post, type }) => {
+  const router = useRouter();
+
   return (
     <div className="container mx-auto mt-5 px-4">
-      <h1 className="text-4xl font-bold text-black">{post.title}</h1>
+      {/* Display "Event" or "Blog" based on type */}
+      <h1 className="text-4xl font-bold text-black">
+        {type === "event" ? "Event: " : "Blog: "} {post.title}
+      </h1>
+      
       <img src={post.image} alt={post.title} className="w-full h-96 object-cover my-4" />
       <p className="text-gray-600">{post.description}</p>
-      {/* ✅ Display Full Blog Content */}
+
+      {/* Full Content */}
       <div className="mt-4 text-gray-800">{post.content}</div>
+
+      {/* Back button */}
+      <button
+        onClick={() => router.back()}
+        className="mt-6 px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300"
+      >
+        Back
+      </button>
     </div>
   );
 };
