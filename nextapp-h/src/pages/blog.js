@@ -29,7 +29,7 @@ const Blog = ({ posts }) => {
               <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
               <p className="text-gray-600">{post.description}</p>
               {/* ✅ Fix: Remove '/blog/' from the path */}
-              <Link href={`/${post.id}`} className="text-blue-500 mt-2 block">
+              <Link href={`Blogs/${post.id}`} className="text-blue-500 mt-2 block">
                 Read More →
               </Link>
             </div>
