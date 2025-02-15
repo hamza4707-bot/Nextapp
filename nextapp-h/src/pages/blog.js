@@ -38,8 +38,9 @@ const Blog = ({ posts }) => {
           </div>
         ))}
       </div>
-    </div>
 <Footer />
+    </div>
+
   );
 };
 
