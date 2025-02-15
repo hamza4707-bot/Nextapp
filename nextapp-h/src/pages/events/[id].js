@@ -43,8 +43,8 @@ const EventPage = ({ event }) => {
       <div className="mt-4 text-gray-800">{event.content}</div>
 
       {/* Date and Location */}
-      <h2 className="text-xl font-semibold mt-4">📅 Date: {event.date}</h2>
-      <h2 className="text-xl font-semibold mt-2">📍 Location: {event.location}</h2>
+      <h2 className="text-xl text-black font-semibold mt-4">📅 Date: {event.date}</h2>
+      <h2 className="text-xl text-black font-semibold mt-2">📍 Location: {event.location}</h2>
 
       {/* Facebook Share Button */}
       <button 
