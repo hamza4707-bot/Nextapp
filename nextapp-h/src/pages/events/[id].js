@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebookF } from "@fortawesome/free-brands-svg-icons"; // Correct import
+import { FaFacebook } from "react-icons/fa"; // Import Facebook icon
+import { useEffect, useState } from "react";
 
 export async function getServerSideProps({ params }) {
   const { id } = params;
@@ -22,10 +22,17 @@ export async function getServerSideProps({ params }) {
 
 const EventPage = ({ event }) => {
   const router = useRouter();
+  const [currentUrl, setCurrentUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window.location.href);
+    }
+  }, []);
 
   // Function to generate Facebook share URL
   const shareOnFacebook = () => {
-    const shareURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+    const shareURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
     window.open(shareURL, "_blank", "noopener,noreferrer");
   };
 
@@ -44,7 +51,7 @@ const EventPage = ({ event }) => {
         onClick={shareOnFacebook} 
         className="mt-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
-        <FontAwesomeIcon icon={faFacebookF} className="mr-2" /> Share on Facebook
+        <FaFacebook className="mr-2" /> Share on Facebook
       </button>
 
       {/* Back Button */}
