@@ -33,4 +33,4 @@ const BlogPost = ({ post }) => {
   );
 };
 
-export default BlogPost;
+export default Events;
