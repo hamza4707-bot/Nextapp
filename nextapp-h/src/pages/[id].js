@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/router";
 
-export async function getServerSideProps({ params, resolvedUrl }) {
-  // Detect whether the request is for a blog post or an event
-  const isEvent = resolvedUrl.startsWith("/event/");
+export async function getServerSideProps(context) {
+  const { params, req } = context;
+  const isEvent = req.url.startsWith("/event/");
   const table = isEvent ? "events" : "posts";
 
   // Fetch data from the correct table
@@ -32,7 +32,7 @@ const PostPage = ({ post, type }) => {
       <h1 className="text-4xl font-bold text-black">
         {type === "event" ? "Event: " : "Blog: "} {post.title}
       </h1>
-      
+
       <img src={post.image} alt={post.title} className="w-full h-96 object-cover my-4" />
       <p className="text-gray-600">{post.description}</p>
 
