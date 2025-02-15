@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook } from "@fortawesome/free-brands-svg-icons"; // Import Facebook icon
 
 export async function getServerSideProps({ params }) {
   const { id } = params;
