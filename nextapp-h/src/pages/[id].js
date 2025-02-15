@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const { params, req } = context;
+  
+  // Check if it's an event or post based on URL
   const isEvent = req.url.startsWith("/event/");
   const table = isEvent ? "events" : "posts";
 
