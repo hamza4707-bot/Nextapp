@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   // Filter by keywords in title and excerpt
   if (keywords) {
-    query = query.or(`title.ilike.%${keywords}%,excerpt.ilike.%${keywords}%`);
+    query = query.or(`title.ilike.%${keywords}%, description.ilike.%${keywords}%`);
   }
 
   // Filter by location
