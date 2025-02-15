@@ -18,7 +18,7 @@ export async function getServerSideProps({ params }) {
   return { props: { post } };
 }
 
-const BlogPost = ({ post }) => {
+const Events = ({ post }) => {
   const router = useRouter();
 
   return (
