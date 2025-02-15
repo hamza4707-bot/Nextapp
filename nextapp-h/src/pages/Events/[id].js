@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
+  console.log("Fetching Event ID:", id);  // Debugging ✅
+
   const { data: event, error } = await supabase
     .from("events")
     .select("id, title, image, content, created_at")
@@ -11,7 +13,7 @@ export async function getServerSideProps({ params }) {
     .single();
 
   if (error || !event) {
-    console.error("Error fetching event:", error);
+    console.error("Event Not Found:", error);
     return { notFound: true };
   }
 
