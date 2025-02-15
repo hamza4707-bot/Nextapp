@@ -3,16 +3,16 @@ import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const { params, req } = context;
-  
-  // Check if it's an event or post based on URL
-  const isEvent = req.url.startsWith("/event/");
+
+  // Check if it's an event or post based on the URL structure
+  const isEvent = req.url.includes("/event/");
   const table = isEvent ? "events" : "posts";
 
   // Fetch data from the correct table
   const { data: post, error } = await supabase
     .from(table)
     .select("id, title, image, description, content, created_at")
-    .eq("id", params.id)
+    .eq("id", params.id) // We are using params.id to fetch the specific post/event
     .single();
 
   if (error || !post) {
