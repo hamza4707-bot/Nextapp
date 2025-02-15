@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase"; // ✅ Correct import
+import { supabase } from "@/lib/supabase";
 
 export default function AdminPanel() {
-  const [posts, setPosts] = useState([]);
-  const [events, setEvents] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("posts");
   const [editing, setEditing] = useState(null);
@@ -13,23 +12,23 @@ export default function AdminPanel() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // 🔄 Fetch posts & events from Supabase
+  // 🔄 Fetch Posts or Events
   useEffect(() => {
     async function fetchData() {
-      let { data: postsData, error: postsError } = await supabase.from("posts").select("*");
-      let { data: eventsData, error: eventsError } = await supabase.from("events").select("*");
+      setLoading(true);
+      const table = selectedTab === "posts" ? "posts" : "events";
+      const { data, error } = await supabase.from(table).select("*");
 
-      if (!postsError) setPosts(postsData);
-      if (!eventsError) setEvents(eventsData);
+      if (!error) setItems(data);
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [selectedTab]);
 
   // 📸 Handle image file selection
   const handleImageChange = (e) => setImage(e.target.files[0]);
 
-  // ✅ Handle form submission
+  // ✅ Handle Add/Edit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !description || !content) return alert("All fields are required!");
@@ -37,22 +36,20 @@ export default function AdminPanel() {
     setUploading(true);
     let imageUrl = editing?.image || "";
 
-    // 📤 Upload image if selected
+    // 📤 Upload Image if selected
     if (image) {
-      const fileExtension = image.name.split('.').pop(); // Get file extension
-      const fileName = `${Date.now()}.${fileExtension}`; // Unique filename
+      const fileExtension = image.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExtension}`;
 
-      const { error } = await supabase.storage.from("images").upload(`posts/${fileName}`, image);
-
+      const { error } = await supabase.storage.from("images").upload(`${selectedTab}/${fileName}`, image);
       if (error) {
         alert("Image upload failed");
         setUploading(false);
         return;
       }
 
-      // ✅ Get Public URL and clean it
-      const { data } = supabase.storage.from("images").getPublicUrl(`posts/${fileName}`);
-      imageUrl = data.publicUrl.split("?")[0]; // Remove extra query params
+      const { data } = supabase.storage.from("images").getPublicUrl(`${selectedTab}/${fileName}`);
+      imageUrl = data.publicUrl.split("?")[0]; // Clean URL
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
@@ -70,19 +67,19 @@ export default function AdminPanel() {
     setImage(null);
     setEditing(null);
 
-    // ✅ Fetch updated data without reloading
+    // ✅ Refresh Data
     const { data: updatedData } = await supabase.from(table).select("*");
-    selectedTab === "posts" ? setPosts(updatedData) : setEvents(updatedData);
+    setItems(updatedData);
   };
 
-  // ❌ Handle delete
+  // ❌ Handle Delete
   const handleDelete = async (id) => {
     const table = selectedTab === "posts" ? "posts" : "events";
     await supabase.from(table).delete().eq("id", id);
 
-    // ✅ Fetch updated data after deletion
+    // ✅ Refresh Data
     const { data: updatedData } = await supabase.from(table).select("*");
-    selectedTab === "posts" ? setPosts(updatedData) : setEvents(updatedData);
+    setItems(updatedData);
   };
 
   return (
@@ -90,10 +87,10 @@ export default function AdminPanel() {
       {/* Sidebar */}
       <div className="w-60 bg-gray-800 text-white p-5">
         <h2 className="text-xl font-bold mb-4">Admin Panel</h2>
-        <button onClick={() => setSelectedTab("posts")} className="block w-full py-2 px-4 mb-2 text-left bg-gray-700 hover:bg-gray-600 rounded">
+        <button onClick={() => setSelectedTab("posts")} className="block w-full py-2 px-4 mb-2 bg-gray-700 hover:bg-gray-600 rounded">
           Posts
         </button>
-        <button onClick={() => setSelectedTab("events")} className="block w-full py-2 px-4 text-left bg-gray-700 hover:bg-gray-600 rounded">
+        <button onClick={() => setSelectedTab("events")} className="block w-full py-2 px-4 bg-gray-700 hover:bg-gray-600 rounded">
           Events
         </button>
       </div>
@@ -131,7 +128,7 @@ export default function AdminPanel() {
         {/* List of Posts/Events */}
         {loading ? <p>Loading...</p> : (
           <ul className="space-y-3">
-            {(selectedTab === "posts" ? posts : events).map((item) => (
+            {items.map((item) => (
               <li key={item.id} className="flex items-center justify-between bg-white p-3 rounded shadow">
                 <div className="flex items-center gap-3">
                   {item.image && <img src={item.image} alt={item.title} className="w-12 h-12 rounded" />}
