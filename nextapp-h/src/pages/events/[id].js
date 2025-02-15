@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFacebookF } from "@fortawesome/free-brands-svg-icons"; // Correct import
 
 export async function getServerSideProps({ params }) {
   const { id } = params;
@@ -43,7 +44,7 @@ const EventPage = ({ event }) => {
         onClick={shareOnFacebook} 
         className="mt-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
-      <FontAwesomeIcon {faFacebookF}className="mr-2" />Share on Facebook
+        <FontAwesomeIcon icon={faFacebookF} className="mr-2" /> Share on Facebook
       </button>
 
       {/* Back Button */}
