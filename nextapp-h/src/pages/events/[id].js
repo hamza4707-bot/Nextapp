@@ -4,7 +4,7 @@ export async function getServerSideProps({ params }) {
   const { id } = params;
 
   // Fetch all events from your API
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/searchTravel`);
+  const res = await fetch(`https://trip1o.netlify.app/api/searchTravel`);
   const events = await res.json();
 
   // Find the specific event by ID
