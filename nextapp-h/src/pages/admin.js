@@ -31,6 +31,7 @@ export default function AdminPanel() {
 
     if (error) {
       console.error("Error fetching data:", error);
+      alert("Error fetching data: " + error.message);
     } else {
       setItems(data);
     }
@@ -42,8 +43,10 @@ export default function AdminPanel() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
     if (!title || !description || !content || (selectedTab === "events" && (!location || !date))) {
-      return alert("All fields are required!");
+      alert("All fields are required!");
+      return;
     }
 
     setUploading(true);
@@ -52,16 +55,19 @@ export default function AdminPanel() {
     if (image) {
       const fileExtension = image.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExtension}`;
-      const { error } = await supabase.storage.from("images").upload(`${selectedTab}/${fileName}`, image);
+      const { error: uploadError } = await supabase.storage.from("images").upload(`${selectedTab}/${fileName}`, image);
 
-      if (error) {
-        alert("Image upload failed");
+      if (uploadError) {
+        alert("Image upload failed: " + uploadError.message);
         setUploading(false);
         return;
       }
 
-      const { data } = supabase.storage.from("images").getPublicUrl(`${selectedTab}/${fileName}`);
-      imageUrl = data.publicUrl.split("?")[0];
+      // Get the public URL of the uploaded image
+      const { data: imageData } = supabase.storage.from("images").getPublicUrl(`${selectedTab}/${fileName}`);
+      imageUrl = imageData.publicUrl.split("?")[0];
+
+      console.log("Image uploaded successfully:", imageUrl);
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
@@ -69,8 +75,10 @@ export default function AdminPanel() {
 
     if (selectedTab === "events") {
       dataToInsert.location = location;
-      dataToInsert.date = date; // Storing date as text
+      dataToInsert.date = date;
     }
+
+    console.log("Inserting into:", table, dataToInsert);
 
     let response;
     if (editing) {
@@ -81,6 +89,9 @@ export default function AdminPanel() {
 
     if (response.error) {
       console.error("Error saving data:", response.error);
+      alert("Error saving data: " + response.error.message);
+    } else {
+      console.log("Data inserted successfully:", response);
     }
 
     setUploading(false);
@@ -94,6 +105,7 @@ export default function AdminPanel() {
 
     if (error) {
       console.error("Error deleting data:", error);
+      alert("Error deleting: " + error.message);
     } else {
       fetchData();
     }
