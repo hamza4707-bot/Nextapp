@@ -154,7 +154,7 @@ const Home = () => {
               <div className="p-6">
                 <img src={article.image} alt={article.title} className="w-full h-56 object-cover rounded-md mb-4" />
 
-                <h5 className="text-black text-2xl font-semibold mb-2">{article.title}</h5>
+                <h5 className=" capitalize text-black text-2xl font-semibold mb-2">{article.title}</h5>
 
                 {article.tag && (
                   <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
