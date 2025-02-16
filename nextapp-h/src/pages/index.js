@@ -14,40 +14,41 @@ const Home = () => {
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
+  const [type, setType] = useState('');
+  const [category, setCategory] = useState('');
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const [allArticles, setAllArticles] = useState([]);
 
-
   // Fetch all articles on initial load
-useEffect(() => {
-  const fetchArticles = async () => {
-    const response = await fetch('/api/searchTravel'); // No filter, get all articles
-    const articles = await response.json();
-    setAllArticles(articles); // Store all articles
-    setFilteredArticles(articles); // Show all initially
-  };
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const response = await fetch('/api/searchTravel'); // No filter, get all articles
+      const articles = await response.json();
+      setAllArticles(articles);
+      setFilteredArticles(articles);
+    };
 
-  fetchArticles();
-}, []);
- // Fetch articles whenever the keywords or location change (debounced to optimize API calls)
+    fetchArticles();
+  }, []);
+
+  // Fetch articles whenever filters change (debounced to optimize API calls)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-     handleSearch();
-    }, 500);  // Delay the request by 500ms (debouncing)
+      handleSearch();
+    }, 500);
 
-    return () => clearTimeout(delayDebounceFn); // Cleanup if the component is unmounted
-  }, [keywords, location]);
+    return () => clearTimeout(delayDebounceFn);
+  }, [keywords, location, type, category]);
 
   // Function to handle Enter key press and trigger filtering
   const handleKeyUp = (e) => {
     if (e.key === 'Enter') {
-     handleSearch();  // Trigger the fetch when Enter key is pressed
+      handleSearch();
     }
   };
 
-
-  // Toggle dropdown visibility for the calendar
+  // Toggle calendar dropdown visibility
   const toggleCalendar = () => {
     setDropdownOpen((prevState) => !prevState);
   };
@@ -64,7 +65,6 @@ useEffect(() => {
     };
 
     document.addEventListener('click', handleClickOutside);
-
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
@@ -74,45 +74,30 @@ useEffect(() => {
   const handleSearch = async () => {
     const params = new URLSearchParams();
 
-    if (startDate) {
-      params.append("startDate", startDate.toISOString());
-    }
-    if (endDate) {
-      params.append("endDate", endDate.toISOString());
-    }
-    if (keywords) {
-      params.append("keywords", keywords);
-    }
-    if (location) {
-      params.append("location", location);
-    }
+    if (startDate) params.append("startDate", startDate.toISOString());
+    if (endDate) params.append("endDate", endDate.toISOString());
+    if (keywords) params.append("keywords", keywords);
+    if (location) params.append("location", location);
+    if (type) params.append("type", type);
+    if (category) params.append("category", category);
 
-    // Make an API call with all the filters
     const response = await fetch(`/api/searchTravel?${params.toString()}`);
     const filtered = await response.json();
-
-    // Update the filteredArticles state with the filtered data
     setFilteredArticles(filtered);
   };
 
-const clearDateRange = () => {
-  setStartDate(null);
-  setEndDate(null);
-  setFilteredArticles(allArticles); // Reset to all articles
-  setDropdownOpen(false);
-};
-
-
-  // Handle cancel action (just closes the picker without applying any changes)
-  const cancelDateRange = () => {
-    setDropdownOpen(false); // Simply close the date picker
+  const clearDateRange = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setFilteredArticles(allArticles);
+    setDropdownOpen(false);
   };
 
   return (
     <div className="">
       <Menu /> {/* Include the Menu Component */}
       
-      <div className="container mx-auto mt-30 px-2 ml-5   " >
+      <div className="container mx-auto mt-30 px-2 ml-5">
         <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
           Looking for a new adventure this weekend in Orange County, California?
         </h1>
@@ -129,7 +114,7 @@ const clearDateRange = () => {
               type="text"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-               onKeyUp={handleKeyUp} 
+              onKeyUp={handleKeyUp} 
               className="p-3 border border-gray-300 rounded-md text-black"
               placeholder="Search for events"
             />
@@ -137,7 +122,7 @@ const clearDateRange = () => {
 
           {/* Location Search */}
           <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600 text-black">Location</label>
+            <label className="mb-2 text-sm text-gray-600">Location</label>
             <input
               type="text"
               value={location}
@@ -148,73 +133,44 @@ const clearDateRange = () => {
             />
           </div>
 
-          {/* Date Range Picker */}
-          <div className="flex flex-col relative ">
-            <label className="mb-2 text-sm text-gray-600">Date Range</label>
-            <div className="flex items-center">
-              <input
-                type="text"
-                readOnly
-                value={startDate && endDate ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}` : ''}
-                className="p-3 border border-gray-300 rounded-md flex-grow text-black"
-                placeholder="Select Date Range"
-                onClick={toggleCalendar}
-              />
-            </div>
-            {isDropdownOpen && (
-              <div ref={dropdownRef} className="absolute wid mt-2 bg-white shadow-lg rounded-md w-64 p-4 z-50">
-                {/* Date Range Picker Box */}
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  startDate={startDate}
-                  endDate={endDate}
-                  selectsStart
-                  placeholderText="Start Date"
-                  className="w-full p-2 border border-gray-300 rounded-md text-black"
-                />
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
-                  startDate={startDate}
-                  endDate={endDate}
-                  selectsEnd
-                  minDate={startDate}
-                  placeholderText="End Date"
-                  className="w-full p-2 border border-gray-300 rounded-md mt-4 text-black"
-                />
-                <div className="mt-4 flex justify-between">
-                  <button
-                    onClick={clearDateRange}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
-                  >
-                    Clear
-                  </button>
-                  <button
-                    onClick={cancelDateRange}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
-                  >
-                    Cancel
-                  </button>
+          {/* Type Filter */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Type</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+            >
+              <option value="">Select Type</option>
+              <option value="adventure">Adventure</option>
+              <option value="relaxation">Relaxation</option>
+              <option value="cultural">Cultural</option>
+              <option value="sports">Sports</option>
+            </select>
+          </div>
 
-                  <button
-                    onClick={handleSearch}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            )}
+          {/* Category Filter */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+            >
+              <option value="">Select Category</option>
+              <option value="hiking">Hiking</option>
+              <option value="beach">Beach</option>
+              <option value="museum">Museum</option>
+              <option value="concert">Concert</option>
+            </select>
           </div>
         </div>
 
         {/* Grid of Filtered Articles */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 align-center" >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArticles.map((article) => (
             <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-              {/* Image */}
-              <img src={article.image} alt={article.title} className="w-full h-56 object-cover h-style" />
+              <img src={article.image} alt={article.title} className="w-full h-56 object-cover" />
               <div className="p-6">
                 <h5 className="text-black text-2xl font-semibold mb-4">{article.title}</h5>
                 <p className="text-gray-700 mb-4">{article.excerpt}</p>
@@ -234,7 +190,7 @@ const clearDateRange = () => {
           ))}
         </div>
       </div>
-            <Footer />
+      <Footer />
     </div>
   );
 };
