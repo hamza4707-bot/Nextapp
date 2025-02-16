@@ -6,15 +6,18 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("posts");
   const [editing, setEditing] = useState(null);
+
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(""); // Now text field instead of datetime
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
+  const [tag, setTag] = useState("");
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  // 🔄 Fetch Posts or Events
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -27,20 +30,17 @@ export default function AdminPanel() {
     fetchData();
   }, [selectedTab]);
 
-  // 📸 Handle image file selection
   const handleImageChange = (e) => setImage(e.target.files[0]);
 
-  // ✅ Handle Add/Edit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !description || !content || (selectedTab === "events" && (!location || !date))) {
+    if (!title || !description || !content || (selectedTab === "events" && (!location || !date || !category || !type))) {
       return alert("All fields are required!");
     }
 
     setUploading(true);
     let imageUrl = editing?.image || "";
 
-    // 📤 Upload Image if selected
     if (image) {
       const fileExtension = image.name.split(".").pop();
       const fileName = `${Date.now()}.${fileExtension}`;
@@ -53,7 +53,7 @@ export default function AdminPanel() {
       }
 
       const { data } = supabase.storage.from("images").getPublicUrl(`${selectedTab}/${fileName}`);
-      imageUrl = data.publicUrl.split("?")[0]; // Clean URL
+      imageUrl = data.publicUrl.split("?")[0];
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
@@ -61,7 +61,10 @@ export default function AdminPanel() {
 
     if (selectedTab === "events") {
       dataToInsert.location = location;
-      dataToInsert.date = date;
+      dataToInsert.date = date; // Now storing as text
+      dataToInsert.category = category;
+      dataToInsert.type = type;
+      if (tag) dataToInsert.tag = tag;
     }
 
     if (editing) {
@@ -73,30 +76,29 @@ export default function AdminPanel() {
     setUploading(false);
     setTitle("");
     setLocation("");
-    setDate("");
+    setDate(""); // Reset date field
     setDescription("");
     setContent("");
     setImage(null);
+    setTag("");
+    setCategory("");
+    setType("");
     setEditing(null);
 
-    // ✅ Refresh Data
     const { data: updatedData } = await supabase.from(table).select("*");
     setItems(updatedData);
   };
 
-  // ❌ Handle Delete
   const handleDelete = async (id) => {
     const table = selectedTab === "posts" ? "posts" : "events";
     await supabase.from(table).delete().eq("id", id);
 
-    // ✅ Refresh Data
     const { data: updatedData } = await supabase.from(table).select("*");
     setItems(updatedData);
   };
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
       <div className="w-60 bg-gray-800 text-white p-5">
         <h2 className="text-xl font-bold mb-4">Admin Panel</h2>
         <button onClick={() => setSelectedTab("posts")} className="block w-full py-2 px-4 mb-2 bg-gray-700 hover:bg-gray-600 rounded">
@@ -107,11 +109,9 @@ export default function AdminPanel() {
         </button>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 p-5">
         <h1 className="text-2xl font-bold mb-4">Manage {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)}</h1>
 
-        {/* Form for Adding/Editing */}
         <form onSubmit={handleSubmit} className="mb-5 bg-gray-100 p-4 rounded">
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title"
             className="w-full p-2 border rounded mb-3" />
@@ -121,7 +121,16 @@ export default function AdminPanel() {
               <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location"
                 className="w-full p-2 border rounded mb-3" />
 
-              <input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)}
+              <input type="text" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date (e.g., '25-Dec-2025 to 12-12-2034')"
+                className="w-full p-2 border rounded mb-3" />
+
+              <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category"
+                className="w-full p-2 border rounded mb-3" />
+
+              <input type="text" value={type} onChange={(e) => setType(e.target.value)} placeholder="Type"
+                className="w-full p-2 border rounded mb-3" />
+
+              <input type="text" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Tag (Optional)"
                 className="w-full p-2 border rounded mb-3" />
             </>
           )}
@@ -147,7 +156,6 @@ export default function AdminPanel() {
           )}
         </form>
 
-        {/* List of Posts/Events */}
         {loading ? <p>Loading...</p> : (
           <ul className="space-y-3">
             {items.map((item) => (
@@ -156,18 +164,15 @@ export default function AdminPanel() {
                   {item.image && <img src={item.image} alt={item.title} className="w-12 h-12 rounded" />}
                   <div>
                     <h3 className="font-bold">{item.title}</h3>
-                    {selectedTab === "events" && <p className="text-sm">{item.location} - {new Date(item.date).toLocaleDateString()}</p>}
+                    {selectedTab === "events" && (
+                      <p className="text-sm">
+                        {item.location} - {item.date}<br />
+                        <span className="text-xs bg-gray-300 px-2 py-1 rounded">{item.category}</span>
+                        <span className="text-xs bg-blue-300 px-2 py-1 rounded ml-2">{item.type}</span>
+                        {item.tag && <span className="text-xs bg-green-300 px-2 py-1 rounded ml-2">{item.tag}</span>}
+                      </p>
+                    )}
                   </div>
-                </div>
-                <div>
-                  <button onClick={() => { setEditing(item); setTitle(item.title); setLocation(item.location); setDate(item.date); setDescription(item.description); setContent(item.content); }}
-                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 mr-2">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(item.id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                    Delete
-                  </button>
                 </div>
               </li>
             ))}
