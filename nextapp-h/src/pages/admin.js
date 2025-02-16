@@ -14,8 +14,8 @@ export default function AdminPanel() {
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  
-  // New Fields
+
+  // Only for Events
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
   const [tag, setTag] = useState("");
@@ -31,7 +31,6 @@ export default function AdminPanel() {
 
     if (error) {
       console.error("Error fetching data:", error);
-      alert("Error fetching data: " + error.message);
     } else {
       setItems(data);
     }
@@ -63,22 +62,20 @@ export default function AdminPanel() {
         return;
       }
 
-      // Get the public URL of the uploaded image
       const { data: imageData } = supabase.storage.from("images").getPublicUrl(`${selectedTab}/${fileName}`);
       imageUrl = imageData.publicUrl.split("?")[0];
-
-      console.log("Image uploaded successfully:", imageUrl);
     }
 
     const table = selectedTab === "posts" ? "posts" : "events";
-    const dataToInsert = { title, description, content, image: imageUrl, type, category, tag };
+    const dataToInsert = { title, description, content, image: imageUrl };
 
     if (selectedTab === "events") {
       dataToInsert.location = location;
       dataToInsert.date = date;
+      dataToInsert.type = type;
+      dataToInsert.category = category;
+      dataToInsert.tag = tag;
     }
-
-    console.log("Inserting into:", table, dataToInsert);
 
     let response;
     if (editing) {
@@ -90,8 +87,6 @@ export default function AdminPanel() {
     if (response.error) {
       console.error("Error saving data:", response.error);
       alert("Error saving data: " + response.error.message);
-    } else {
-      console.log("Data inserted successfully:", response);
     }
 
     setUploading(false);
@@ -105,7 +100,6 @@ export default function AdminPanel() {
 
     if (error) {
       console.error("Error deleting data:", error);
-      alert("Error deleting: " + error.message);
     } else {
       fetchData();
     }
@@ -160,13 +154,16 @@ export default function AdminPanel() {
           <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Content"
             className="w-full p-2 border rounded mb-3"></textarea>
 
-          {/* New Fields */}
-          <input type="text" value={type} onChange={(e) => setType(e.target.value)} placeholder="Type"
-            className="w-full p-2 border rounded mb-3" />
-          <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category"
-            className="w-full p-2 border rounded mb-3" />
-          <input type="text" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Tag"
-            className="w-full p-2 border rounded mb-3" />
+          {selectedTab === "events" && (
+            <>
+              <input type="text" value={type} onChange={(e) => setType(e.target.value)} placeholder="Type"
+                className="w-full p-2 border rounded mb-3" />
+              <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category"
+                className="w-full p-2 border rounded mb-3" />
+              <input type="text" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Tag"
+                className="w-full p-2 border rounded mb-3" />
+            </>
+          )}
 
           <input type="file" accept="image/*" onChange={handleImageChange}
             className="w-full p-2 border rounded mb-3" />
