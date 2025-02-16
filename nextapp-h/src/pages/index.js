@@ -20,10 +20,9 @@ const Home = () => {
   const buttonRef = useRef(null);
   const [allArticles, setAllArticles] = useState([]);
 
-  // Fetch all articles on initial load
   useEffect(() => {
     const fetchArticles = async () => {
-      const response = await fetch('/api/searchTravel'); // No filter, get all articles
+      const response = await fetch('/api/searchTravel');
       const articles = await response.json();
       setAllArticles(articles);
       setFilteredArticles(articles);
@@ -32,7 +31,6 @@ const Home = () => {
     fetchArticles();
   }, []);
 
-  // Fetch articles whenever filters change (debounced to optimize API calls)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleSearch();
@@ -41,36 +39,6 @@ const Home = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [keywords, location, type, category]);
 
-  // Function to handle Enter key press and trigger filtering
-  const handleKeyUp = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  // Toggle calendar dropdown visibility
-  const toggleCalendar = () => {
-    setDropdownOpen((prevState) => !prevState);
-  };
-
-  // Handle outside click detection
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current && !dropdownRef.current.contains(event.target) && 
-        buttonRef.current && !buttonRef.current.contains(event.target)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
-  // Handle search/filter logic
   const handleSearch = async () => {
     const params = new URLSearchParams();
 
@@ -86,17 +54,9 @@ const Home = () => {
     setFilteredArticles(filtered);
   };
 
-  const clearDateRange = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setFilteredArticles(allArticles);
-    setDropdownOpen(false);
-  };
-
   return (
     <div className="">
-      <Menu /> {/* Include the Menu Component */}
-      
+      <Menu />
       <div className="container mx-auto mt-30 px-2 ml-5">
         <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
           Looking for a new adventure this weekend in Orange County, California?
@@ -107,33 +67,28 @@ const Home = () => {
 
         {/* Search Section */}
         <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Keywords Search */}
           <div className="flex flex-col">
             <label className="mb-2 text-sm text-gray-600">Keyword</label>
             <input
               type="text"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              onKeyUp={handleKeyUp} 
               className="p-3 border border-gray-300 rounded-md text-black"
               placeholder="Search for events"
             />
           </div>
 
-          {/* Location Search */}
           <div className="flex flex-col">
             <label className="mb-2 text-sm text-gray-600">Location</label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              onKeyUp={handleKeyUp} 
               className="p-3 border border-gray-300 rounded-md text-black"
               placeholder="Enter location"
             />
           </div>
 
-          {/* Type Filter */}
           <div className="flex flex-col">
             <label className="mb-2 text-sm text-gray-600">Type</label>
             <select
@@ -149,7 +104,6 @@ const Home = () => {
             </select>
           </div>
 
-          {/* Category Filter */}
           <div className="flex flex-col">
             <label className="mb-2 text-sm text-gray-600">Category</label>
             <select
@@ -166,15 +120,29 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Grid of Filtered Articles */}
+        {/* Filtered Articles Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArticles.map((article) => (
             <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <img src={article.image} alt={article.title} className="w-full h-56 object-cover" />
               <div className="p-6">
-                <h5 className="text-black text-2xl font-semibold mb-4">{article.title}</h5>
+                {/* Image */}
+                <img src={article.image} alt={article.title} className="w-full h-56 object-cover rounded-md mb-4" />
+
+                {/* Title */}
+                <h5 className="text-black text-2xl font-semibold mb-2">{article.title}</h5>
+
+                {/* Tag (Badge) */}
+                {article.tag && (
+                  <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                    {article.tag}
+                  </span>
+                )}
+
+                {/* Description */}
                 <p className="text-gray-700 mb-4">{article.excerpt}</p>
-                <p className="text-gray-700 mb-4">
+
+                {/* Date & Location */}
+                <p className="text-gray-700 mb-2">
                   <FontAwesomeIcon icon={faClock} className="mr-2" />
                   {article.date}
                 </p>
@@ -182,8 +150,12 @@ const Home = () => {
                   <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
                   {article.location}
                 </p>
-                <Link href={`/events/${article.id}`} className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                  View Event
+
+                {/* View Event Button */}
+                <Link href={`/events/${article.id}`}>
+                  <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">
+                    View Event
+                  </span>
                 </Link>
               </div>
             </div>
