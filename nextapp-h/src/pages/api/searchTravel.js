@@ -22,12 +22,12 @@ export default async function handler(req, res) {
   }
 
   if (type) {
-    query = query.ilike('type', `%${type}%`);
-  }
+    query = query.ilike('type', `%${type}%`); // Keep 'type' as is
+}
 
-  if (category) {
-    query = query.ilike('category', `%${category}%`);
-  }
+if (category) {
+    query = query.ilike('cat', `%${category}%`); // Use 'cat' instead of 'category'
+}
 
   const { data, error } = await query;
 
