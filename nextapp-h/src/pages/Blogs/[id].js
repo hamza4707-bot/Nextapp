@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/router";
-
+import Menu from '../components/Menu';
+import Footer from '../components/Footer';
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
@@ -22,6 +23,8 @@ const BlogPost = ({ post }) => {
   const router = useRouter();
 
   return (
+<div>
+<Menu />
     <div className="container mx-auto mt-5 px-4">
       <h1 className="text-4xl font-bold text-black">{post.title}</h1>
       <img src={post.image} alt={post.title} className="w-full h-96 object-cover my-4" />
@@ -30,6 +33,8 @@ const BlogPost = ({ post }) => {
         Back
       </button>
     </div>
+<Footer />
+</div>
   );
 };
 
