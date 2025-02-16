@@ -5,9 +5,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { startDate, endDate, keywords, location } = req.query;
+  const { startDate, endDate, keywords, location, type, category } = req.query;
 
-  let query = supabase.from('events').select('*');
+  let query = supabase.from('events').select('*'); // Select everything, including `tag`
 
   if (startDate && endDate) {
     query = query.gte('date', startDate).lte('date', endDate);
@@ -19,6 +19,14 @@ export default async function handler(req, res) {
 
   if (location) {
     query = query.ilike('location', `%${location}%`);
+  }
+
+  if (type) {
+    query = query.ilike('type', `%${type}%`);
+  }
+
+  if (category) {
+    query = query.ilike('category', `%${category}%`);
   }
 
   const { data, error } = await query;
