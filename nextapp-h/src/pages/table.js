@@ -32,7 +32,7 @@ export default function Table() {
     <div className="flex">
       {/* Sidebar */}
       <div className="w-1/4 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-6">Dashboard</h2>
+        <h2 className="text-xl text-black-500 font-bold mb-6">Dashboard</h2>
         <ul className="space-y-4">
           <li>
             <button
