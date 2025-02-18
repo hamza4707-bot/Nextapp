@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function pol() {
-  
+export default function Pol() {
+  const [students, setStudents] = useState([]); // State to store fetched students
   const [loading, setLoading] = useState(true);
-  
 
   useEffect(() => {
     fetchData();
@@ -12,31 +11,30 @@ export default function pol() {
 
   async function fetchData() {
     setLoading(true);
-    const table = "students";
-    const { data, error } = await supabase.from(table).select("*");
+    const { data, error } = await supabase.from("students").select("*");
 
-   
+    if (error) {
+      console.error("Error fetching students:", error);
+    } else {
+      setStudents(data || []); // Store data in state
+    }
 
     setLoading(false);
   }
 
-  
-
   return (
     <div className="flex h-screen">
-      
-      {/* Main Content */}
       <div className="flex-1 p-5">
-        <h1 className="text-2xl font-bold mb-4">Students </h1>
+        <h1 className="text-2xl font-bold mb-4">Students</h1>
 
-  
-       
         {/* List */}
-        {loading ? <p>Loading...</p> : (
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
           <ul className="space-y-3">
-            {data.map((item) => (
-              <li key={item.firstname} className="flex items-center justify-between bg-white p-3 rounded shadow">
- {key}
+            {students.map((student) => (
+              <li key={student.student_id} className="flex items-center justify-between bg-white p-3 rounded shadow">
+                {student.first_name} {student.last_name}
               </li>
             ))}
           </ul>
