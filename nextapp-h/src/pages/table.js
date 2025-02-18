@@ -19,7 +19,9 @@ import {
   TableRow,
   Paper,
   CircularProgress,
+  Divider,
 } from "@mui/material";
+import { styled } from "@mui/system";
 
 export default function Dashboard() {
   const [students, setStudents] = useState([]);
@@ -52,7 +54,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#121212" }}>
       {/* Sidebar */}
       <Drawer
         sx={{
@@ -61,6 +63,9 @@ export default function Dashboard() {
           "& .MuiDrawer-paper": {
             width: 250,
             boxSizing: "border-box",
+            bgcolor: "#1f1f1f",
+            color: "#fff",
+            borderRight: "none",
           },
         }}
         variant="permanent"
@@ -68,10 +73,11 @@ export default function Dashboard() {
       >
         <List>
           <ListItem button onClick={() => setSelectedTab("students")}>
-            <ListItemText primary="Students" />
+            <ListItemText primary="Students" sx={{ color: "#fff" }} />
           </ListItem>
+          <Divider sx={{ bgcolor: "#333" }} />
           <ListItem button onClick={() => setSelectedTab("teaches")}>
-            <ListItemText primary="Teachers" />
+            <ListItemText primary="Teachers" sx={{ color: "#fff" }} />
           </ListItem>
         </List>
       </Drawer>
@@ -79,11 +85,19 @@ export default function Dashboard() {
       {/* Main Content */}
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+        sx={{
+          flexGrow: 1,
+          bgcolor: "#121212",
+          color: "#fff",
+          p: 3,
+          overflow: "auto",
+        }}
       >
-        <AppBar position="sticky">
+        <AppBar position="sticky" sx={{ bgcolor: "#1E293B" }}>
           <Toolbar>
-            <Typography variant="h6">Dashboard</Typography>
+            <Typography variant="h6" sx={{ color: "#fff" }}>
+              Dashboard
+            </Typography>
           </Toolbar>
         </AppBar>
 
@@ -93,41 +107,81 @@ export default function Dashboard() {
           onChange={(event, newValue) => setSelectedTab(newValue)}
           indicatorColor="secondary"
           textColor="inherit"
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 3,
+            bgcolor: "#1f1f1f",
+            borderRadius: 1,
+            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+          }}
         >
-          <Tab label="Students" value="students" />
-          <Tab label="Teachers" value="teaches" />
+          <Tab label="Students" value="students" sx={{ fontWeight: "bold" }} />
+          <Tab label="Teachers" value="teaches" sx={{ fontWeight: "bold" }} />
         </Tabs>
 
         {/* Data Tables */}
         {loading ? (
-          <div className="flex justify-center items-center">
-            <CircularProgress />
+          <div className="flex justify-center items-center mt-5">
+            <CircularProgress sx={{ color: "#1E293B" }} />
           </div>
         ) : selectedTab === "students" ? (
-          <TableContainer component={Paper} sx={{ mt: 3 }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              mt: 3,
+              bgcolor: "#2c2c2c",
+              borderRadius: 2,
+              boxShadow: 3,
+              overflow: "hidden",
+            }}
+          >
             <Table>
-              <TableHead>
+              <TableHead sx={{ bgcolor: "#1E293B" }}>
                 <TableRow>
-                  <TableCell>Student ID</TableCell>
-                  <TableCell>Full Name</TableCell>
-                  <TableCell>Roll Number</TableCell>
-                  <TableCell>Date of Birth</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Address</TableCell>
-                  <TableCell>City</TableCell>
-                  <TableCell>State</TableCell>
-                  <TableCell>Country</TableCell>
-                  <TableCell>Created At</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Student ID
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Full Name
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Roll Number
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Date of Birth
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Gender
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Email
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Phone
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Address
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    City
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    State
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Country
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Created At
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {students.map((student) => (
-                  <TableRow key={student.student_id}>
+                  <TableRow key={student.student_id} hover sx={{ bgcolor: "#333" }}>
                     <TableCell>{student.student_id}</TableCell>
-                    <TableCell>{student.first_name} {student.last_name}</TableCell>
+                    <TableCell>
+                      {student.first_name} {student.last_name}
+                    </TableCell>
                     <TableCell>{student.roll_number}</TableCell>
                     <TableCell>{student.date_of_birth}</TableCell>
                     <TableCell>{student.gender}</TableCell>
@@ -137,29 +191,54 @@ export default function Dashboard() {
                     <TableCell>{student.city}</TableCell>
                     <TableCell>{student.state}</TableCell>
                     <TableCell>{student.country}</TableCell>
-                    <TableCell>{new Date(student.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(student.created_at).toLocaleDateString()}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
         ) : (
-          <TableContainer component={Paper} sx={{ mt: 3 }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              mt: 3,
+              bgcolor: "#2c2c2c",
+              borderRadius: 2,
+              boxShadow: 3,
+              overflow: "hidden",
+            }}
+          >
             <Table>
-              <TableHead>
+              <TableHead sx={{ bgcolor: "#1E293B" }}>
                 <TableRow>
-                  <TableCell>Teach ID</TableCell>
-                  <TableCell>Student ID</TableCell>
-                  <TableCell>Subject Name</TableCell>
-                  <TableCell>Teacher Name</TableCell>
-                  <TableCell>Start Date</TableCell>
-                  <TableCell>End Date</TableCell>
-                  <TableCell>Grade</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Teach ID
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Student ID
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Subject Name
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Teacher Name
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Start Date
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    End Date
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Grade
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {teachers.map((teacher) => (
-                  <TableRow key={teacher.teach_id}>
+                  <TableRow key={teacher.teach_id} hover sx={{ bgcolor: "#333" }}>
                     <TableCell>{teacher.teach_id}</TableCell>
                     <TableCell>{teacher.student_id}</TableCell>
                     <TableCell>{teacher.subject_name}</TableCell>
