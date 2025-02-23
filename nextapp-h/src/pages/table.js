@@ -1,149 +1,63 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import {
-  Box,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Tabs,
-  Tab,
-  Button,
-  TextField,
-} from "@mui/material";
+import { useState, useEffect } from "react"; import { supabase } from "@/lib/supabase"; import FullCalendar from "@fullcalendar/react"; import dayGridPlugin from "@fullcalendar/daygrid"; import interactionPlugin from "@fullcalendar/interaction"; import { Tabs, Tab, Button, TextField, } from "@mui/material";
 
-export default function TablePage() {
-  const [selectedTab, setSelectedTab] = useState("students"); // Default tab
-  const [subTab, setSubTab] = useState("view"); // "view" or "add"
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({}); // Form data for new entries
+export default function Dashboard() { const [selectedTab, setSelectedTab] = useState("calendar"); const [subTab, setSubTab] = useState("view"); const [data, setData] = useState([]); const [loading, setLoading] = useState(true); const [formData, setFormData] = useState({}); const [events, setEvents] = useState([]);
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedTab, subTab]);
+useEffect(() => { if (selectedTab !== "calendar") fetchData(); }, [selectedTab]);
 
-  async function fetchData() {
-    setLoading(true);
-    const table = selectedTab;
+async function fetchData() { setLoading(true); const table = selectedTab; const { data, error } = await supabase.from(table).select("*"); if (!error) setData(data || []); setLoading(false); }
 
-    const { data, error } = await supabase.from(table).select("*");
+async function handleAddEntry() { const table = selectedTab; const { data, error } = await supabase.from(table).insert([formData]); if (!error) { setFormData({}); fetchData(); } }
 
-    if (error) {
-      console.error(`Error fetching ${table}:`, error);
-    } else {
-      setData(data || []);
-    }
+function handleDateClick(info) { const title = prompt("Enter Event Title"); if (title) { setEvents([...events, { title, start: info.dateStr }]); } }
 
-    setLoading(false);
-  }
+return ( <div className="flex h-screen bg-gray-100"> {/* Sidebar */} <aside className="w-64 bg-white p-5 shadow-md"> <h2 className="text-lg font-bold mb-4">Dashboard</h2> <ul className="space-y-2"> <li> <button onClick={() => setSelectedTab("calendar")} className="w-full text-left p-2 hover:bg-gray-200 rounded">Calendar</button> </li> <li> <button onClick={() => setSelectedTab("students")} className="w-full text-left p-2 hover:bg-gray-200 rounded">Students</button> </li> <li> <button onClick={() => setSelectedTab("teachers")} className="w-full text-left p-2 hover:bg-gray-200 rounded">Teachers</button> </li> </ul> </aside>
 
-  async function handleAddEntry() {
-    const table = selectedTab;
-    
-    const { data, error } = await supabase.from(table).insert([formData]);
-
-    if (error) {
-      console.error(`Error adding entry to ${table}:`, error);
-    } else {
-      setFormData({}); // Reset form after successful submission
-      fetchData(); // Refresh data
-    }
-  }
-
-  return (
-    <Box sx={{ p: 3, bgcolor: "#121212", minHeight: "100vh", color: "#fff" }}>
-      {/* Tabs for Students, Teachers, and Attendance */}
-      <Tabs
-        value={selectedTab}
-        onChange={(event, newValue) => setSelectedTab(newValue)}
-        indicatorColor="secondary"
-        textColor="inherit"
-        sx={{ mb: 2 }}
-      >
-        <Tab label="Students" value="students" />
-        <Tab label="Teachers" value="teachers" />
-        <Tab label="Attendance" value="attendance" />
-      </Tabs>
-
-      {/* Sub Tabs for View / Add */}
-      <Tabs
-        value={subTab}
-        onChange={(event, newValue) => setSubTab(newValue)}
-        indicatorColor="secondary"
-        textColor="inherit"
-        sx={{ mb: 2 }}
-      >
-        <Tab label="View" value="view" />
-        <Tab label="Add" value="add" />
-      </Tabs>
-
-      {/* View Data Table */}
-      {subTab === "view" ? (
-        loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-            <CircularProgress sx={{ color: "#fff" }} />
-          </Box>
+{/* Main Content */}
+  <main className="flex-1 p-5">
+    {selectedTab === "calendar" ? (
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        events={events}
+        dateClick={handleDateClick}
+      />
+    ) : (
+      <>
+        <Tabs value={subTab} onChange={(e, v) => setSubTab(v)}>
+          <Tab label="View" value="view" />
+          <Tab label="Add" value="add" />
+        </Tabs>
+        {subTab === "add" ? (
+          <div className="mt-4 p-4 bg-white shadow rounded">
+            {selectedTab === "teachers" ? (
+              <>
+                <TextField label="Name" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <TextField label="Subject" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, subject: e.target.value})} />
+                <TextField label="Email" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                <TextField label="Password" fullWidth className="mb-2" type="password" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+              </>
+            ) : (
+              <>
+                <TextField label="Name" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <TextField label="Roll Number" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} />
+                <TextField label="Grade" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, grade: e.target.value})} />
+                <TextField label="Courses" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, courses: e.target.value})} />
+                <TextField label="Email" fullWidth className="mb-2" onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                <TextField label="Password" fullWidth className="mb-2" type="password" onChange={(e) => setFormData({...formData, password: e.target.value})} />
+              </>
+            )}
+            <Button variant="contained" color="primary" onClick={handleAddEntry}>Add Entry</Button>
+          </div>
         ) : (
-          <TableContainer component={Paper} sx={{ bgcolor: "#2c2c2c" }}>
-            <Table>
-              <TableHead sx={{ bgcolor: "#1E293B" }}>
-                <TableRow>
-                  {data.length > 0 &&
-                    Object.keys(data[0]).map((key) => (
-                      <TableCell key={key} sx={{ color: "#fff" }}>
-                        {key.toUpperCase()}
-                      </TableCell>
-                    ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.map((row, index) => (
-                  <TableRow key={index} sx={{ bgcolor: "#333" }}>
-                    {Object.values(row).map((value, idx) => (
-                      <TableCell key={idx} sx={{ color: "#fff" }}>
-                        {value}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )
-      ) : (
-        // Add New Entry Form
-        <Box sx={{ mt: 3 }}>
-          {Object.keys(formData).length === 0 && data.length > 0 ? (
-            Object.keys(data[0]).map((key) => (
-              <TextField
-                key={key}
-                label={key.toUpperCase()}
-                variant="outlined"
-                fullWidth
-                sx={{ mb: 2, bgcolor: "#fff" }}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, [key]: e.target.value }))
-                }
-              />
-            ))
-          ) : (
-            <p>No data structure found for form fields.</p>
-          )}
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
-            onClick={handleAddEntry}
-          >
-            Add Entry
-          </Button>
-        </Box>
-      )}
-    </Box>
-  );
-}
+          <div className="mt-4 bg-white p-4 shadow rounded">
+            <h3 className="text-lg font-bold mb-2">{selectedTab} List</h3>
+            {loading ? <p>Loading...</p> : data.map((item, i) => <p key={i}>{JSON.stringify(item)}</p>)}
+          </div>
+        )}
+      </>
+    )}
+  </main>
+</div>
+
+); }
+
