@@ -1,135 +1,18 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import { FaUserGraduate, FaChalkboardTeacher, FaCalendarAlt } from "react-icons/fa";
-import { AiOutlineUserAdd } from "react-icons/ai";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
+import { useState, useEffect } from "react"; import { supabase } from "@/lib/supabase"; import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Tabs, Tab, Button, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material"; import { Home, School, Event, People, Add } from "@mui/icons-material"; import FullCalendar from "@fullcalendar/react"; import dayGridPlugin from "@fullcalendar/daygrid";
 
-export default function Dashboard() {
-  const [selectedTab, setSelectedTab] = useState("students");
-  const [subTab, setSubTab] = useState("view");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({});
+export default function Dashboard() { const [selectedTab, setSelectedTab] = useState("students"); const [subTab, setSubTab] = useState("view"); const [data, setData] = useState([]); const [loading, setLoading] = useState(false); const [formData, setFormData] = useState({}); const [events, setEvents] = useState([]); const [openDialog, setOpenDialog] = useState(false); const [eventData, setEventData] = useState({ teacher: "", title: "", date: "" });
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedTab]);
+useEffect(() => { fetchData(); }, [selectedTab]);
 
-  async function fetchData() {
-    setLoading(true);
-    const { data, error } = await supabase.from(selectedTab).select("*");
-    if (error) console.error(error);
-    else setData(data || []);
-    setLoading(false);
-  }
+async function fetchData() { setLoading(true); const { data, error } = await supabase.from(selectedTab).select("*"); if (error) console.error(error); else setData(data || []); setLoading(false); }
 
-  async function handleAddEntry() {
-    const { error } = await supabase.from(selectedTab).insert([formData]);
-    if (error) console.error(error);
-    else {
-      setFormData({});
-      fetchData();
-    }
-  }
+async function handleAddEntry() { const { error } = await supabase.from(selectedTab).insert([formData]); if (error) console.error(error); else { setFormData({}); fetchData(); } }
 
-  return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md p-4">
-        <h2 className="text-xl font-bold mb-4 flex items-center">
-          <FaCalendarAlt className="mr-2" /> Dashboard
-        </h2>
-        <ul className="space-y-3">
-          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
-              onClick={() => setSelectedTab("calendar")}>
-            <FaCalendarAlt className="mr-2" /> Calendar
-          </li>
-          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
-              onClick={() => setSelectedTab("students")}>
-            <FaUserGraduate className="mr-2" /> Students
-          </li>
-          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
-              onClick={() => setSelectedTab("teachers")}>
-            <FaChalkboardTeacher className="mr-2" /> Teachers
-          </li>
-          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
-              onClick={() => setSelectedTab("attendance")}>
-            <AiOutlineUserAdd className="mr-2" /> Attendance
-          </li>
-        </ul>
-      </aside>
+function handleDateClick(info) { setEventData({ ...eventData, date: info.dateStr }); setOpenDialog(true); }
 
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Tabs */}
-        {selectedTab !== "calendar" && (
-          <div className="mb-4 flex space-x-4">
-            <button className={`px-4 py-2 rounded ${subTab === "view" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                    onClick={() => setSubTab("view")}>
-              View
-            </button>
-            <button className={`px-4 py-2 rounded ${subTab === "add" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                    onClick={() => setSubTab("add")}>
-              Add
-            </button>
-          </div>
-        )}
+async function handleAddEvent() { setEvents([...events, eventData]); setOpenDialog(false); }
 
-        {/* Calendar */}
-        {selectedTab === "calendar" ? (
-          <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" />
-        ) : (
-          <>
-            {/* View Table */}
-            {subTab === "view" ? (
-              loading ? (
-                <p className="text-center text-gray-500">Loading...</p>
-              ) : (
-                <div className="bg-white p-4 rounded shadow-md">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        {data.length > 0 &&
-                          Object.keys(data[0]).map((key) => (
-                            <th key={key} className="p-2 text-left">{key.toUpperCase()}</th>
-                          ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.map((row, index) => (
-                        <tr key={index} className="border-t">
-                          {Object.values(row).map((value, idx) => (
-                            <td key={idx} className="p-2">{value}</td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )
-            ) : (
-              // Add New Entry Form
-              <div className="bg-white p-4 rounded shadow-md">
-                {data.length > 0 && Object.keys(data[0]).map((key) => (
-                  key !== "id" && (
-                    <div key={key} className="mb-3">
-                      <label className="block text-sm font-medium">{key.toUpperCase()}</label>
-                      <input type="text"
-                             className="w-full p-2 border rounded"
-                             onChange={(e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }))} />
-                    </div>
-                  )
-                ))}
-                <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded"
-                        onClick={handleAddEntry}>
-                  Add Entry
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+function handleCellDoubleClick(row) { setEventData({ teacher: row.name, title: "", date: "" }); setOpenDialog(true); }
+
+return ( <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f5f5" }}> <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0 }}> <List> {["Calendar", "Students", "Teachers", "Attendance"].map((text, index) => ( <ListItem button key={text} onClick={() => setSelectedTab(text.toLowerCase())}> <ListItemIcon> {index === 0 ? <Event /> : index === 1 ? <People /> : <School />} </ListItemIcon> <ListItemText primary={text} /> </ListItem> ))} </List> </Drawer> <Box sx={{ flexGrow: 1, p: 3 }}> <AppBar position="static" color="default"> <Toolbar> <Typography variant="h6">Dashboard</Typography> </Toolbar> </AppBar> {selectedTab === "calendar" ? ( <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" dateClick={handleDateClick} events={events} /> ) : ( <> <Tabs value={subTab} onChange={(e, val) => setSubTab(val)}> <Tab label="View" value="view" /> <Tab label="Add" value="add" /> </Tabs> {subTab === "view" ? ( loading ? ( <CircularProgress /> ) : ( <TableContainer component={Paper}> <Table> <TableHead> <TableRow> {data.length > 0 && Object.keys(data[0]).map((key) => <TableCell key={key}>{key.toUpperCase()}</TableCell>)} </TableRow> </TableHead> <TableBody> {data.map((row, index) => ( <TableRow key={index} onDoubleClick={() => handleCellDoubleClick(row)}> {Object.values(row).map((value, idx) => ( <TableCell key={idx}>{value}</TableCell> ))} </TableRow> ))} </TableBody> </Table> </TableContainer> ) ) : ( <Box> {Object.keys(data[0] || {}).map((key) => ( <TextField key={key} label={key.toUpperCase()} fullWidth sx={{ mb: 2 }} onChange={(e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }))} /> ))} <Button variant="contained" startIcon={<Add />} onClick={handleAddEntry}>Add Entry</Button> </Box> )} </> )} </Box> <Dialog open={openDialog} onClose={() => setOpenDialog(false)}> <DialogTitle>Add Event</DialogTitle> <DialogContent> <TextField label="Teacher" fullWidth sx={{ mb: 2 }} value={eventData.teacher} disabled /> <TextField label="Event Title" fullWidth sx={{ mb: 2 }} onChange={(e) => setEventData({ ...eventData, title: e.target.value })} /> <TextField label="Date" fullWidth sx={{ mb: 2 }} value={eventData.date} disabled /> </DialogContent> <DialogActions> <Button onClick={() => setOpenDialog(false)}>Cancel</Button> <Button variant="contained" onClick={handleAddEvent}>Add Event</Button> </DialogActions> </Dialog> </Box> ); }
+
