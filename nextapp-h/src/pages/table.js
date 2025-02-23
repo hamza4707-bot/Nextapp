@@ -1,185 +1,135 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { FaUserGraduate, FaChalkboardTeacher, FaCalendarAlt, FaPlus, FaEye } from "react-icons/fa";
+import { FaUserGraduate, FaChalkboardTeacher, FaCalendarAlt } from "react-icons/fa";
+import { AiOutlineUserAdd } from "react-icons/ai";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import {
-  Box,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Tabs,
-  Tab,
-  Button,
-  TextField,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
 
 export default function Dashboard() {
-  const [selectedTab, setSelectedTab] = useState("students"); 
-  const [subTab, setSubTab] = useState("view"); 
+  const [selectedTab, setSelectedTab] = useState("students");
+  const [subTab, setSubTab] = useState("view");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({});
-  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     fetchData();
-  }, [selectedTab, subTab]);
+  }, [selectedTab]);
 
-  const fetchData = async () => {
+  async function fetchData() {
     setLoading(true);
-    const table = selectedTab;
-
-    const { data, error } = await supabase.from(table).select("*");
-
-    if (error) {
-      console.error(`Error fetching ${table}:`, error);
-    } else {
-      setData(data || []);
-    }
-
+    const { data, error } = await supabase.from(selectedTab).select("*");
+    if (error) console.error(error);
+    else setData(data || []);
     setLoading(false);
-  };
+  }
 
-  const handleAddEntry = async () => {
-    const table = selectedTab;
-
-    const { data, error } = await supabase.from(table).insert([formData]);
-
-    if (error) {
-      console.error(`Error adding entry to ${table}:`, error);
-    } else {
+  async function handleAddEntry() {
+    const { error } = await supabase.from(selectedTab).insert([formData]);
+    if (error) console.error(error);
+    else {
       setFormData({});
       fetchData();
     }
-  };
-
-  const handleDateClick = (arg) => {
-    const title = prompt("Enter event title:");
-    if (title) {
-      setEvents([...events, { title, date: arg.dateStr }]);
-    }
-  };
+  }
 
   return (
-    <Box className="flex min-h-screen bg-white text-black">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <Drawer variant="permanent" className="w-64 bg-gray-200 p-4">
-        <List>
-          <ListItem button onClick={() => setSelectedTab("calendar")}>
-            <ListItemIcon><FaCalendarAlt /></ListItemIcon>
-            <ListItemText primary="Calendar" />
-          </ListItem>
-          <ListItem button onClick={() => setSelectedTab("students")}>
-            <ListItemIcon><FaUserGraduate /></ListItemIcon>
-            <ListItemText primary="Students" />
-          </ListItem>
-          <ListItem button onClick={() => setSelectedTab("teachers")}>
-            <ListItemIcon><FaChalkboardTeacher /></ListItemIcon>
-            <ListItemText primary="Teachers" />
-          </ListItem>
-          <ListItem button onClick={() => setSelectedTab("attendance")}>
-            <ListItemIcon><FaEye /></ListItemIcon>
-            <ListItemText primary="Attendance" />
-          </ListItem>
-        </List>
-      </Drawer>
+      <aside className="w-64 bg-white shadow-md p-4">
+        <h2 className="text-xl font-bold mb-4 flex items-center">
+          <FaCalendarAlt className="mr-2" /> Dashboard
+        </h2>
+        <ul className="space-y-3">
+          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
+              onClick={() => setSelectedTab("calendar")}>
+            <FaCalendarAlt className="mr-2" /> Calendar
+          </li>
+          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
+              onClick={() => setSelectedTab("students")}>
+            <FaUserGraduate className="mr-2" /> Students
+          </li>
+          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
+              onClick={() => setSelectedTab("teachers")}>
+            <FaChalkboardTeacher className="mr-2" /> Teachers
+          </li>
+          <li className="flex items-center cursor-pointer p-2 rounded hover:bg-gray-200"
+              onClick={() => setSelectedTab("attendance")}>
+            <AiOutlineUserAdd className="mr-2" /> Attendance
+          </li>
+        </ul>
+      </aside>
 
       {/* Main Content */}
-      <Box className="flex-1 p-6">
-        {/* Show Calendar */}
+      <div className="flex-1 p-6">
+        {/* Tabs */}
+        {selectedTab !== "calendar" && (
+          <div className="mb-4 flex space-x-4">
+            <button className={`px-4 py-2 rounded ${subTab === "view" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    onClick={() => setSubTab("view")}>
+              View
+            </button>
+            <button className={`px-4 py-2 rounded ${subTab === "add" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                    onClick={() => setSubTab("add")}>
+              Add
+            </button>
+          </div>
+        )}
+
+        {/* Calendar */}
         {selectedTab === "calendar" ? (
-          <FullCalendar
-            plugins={[dayGridPlugin]}
-            initialView="dayGridMonth"
-            events={events}
-            dateClick={handleDateClick}
-          />
+          <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" />
         ) : (
           <>
-            {/* Tabs for View / Add */}
-            <Tabs
-              value={subTab}
-              onChange={(event, newValue) => setSubTab(newValue)}
-              className="mb-4"
-            >
-              <Tab icon={<FaEye />} label="View" value="view" />
-              <Tab icon={<FaPlus />} label="Add" value="add" />
-            </Tabs>
-
-            {/* View Data Table */}
+            {/* View Table */}
             {subTab === "view" ? (
               loading ? (
-                <Box className="flex justify-center mt-4">
-                  <CircularProgress />
-                </Box>
+                <p className="text-center text-gray-500">Loading...</p>
               ) : (
-                <TableContainer component={Paper} className="shadow-md">
-                  <Table>
-                    <TableHead className="bg-gray-300">
-                      <TableRow>
+                <div className="bg-white p-4 rounded shadow-md">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-200">
                         {data.length > 0 &&
                           Object.keys(data[0]).map((key) => (
-                            <TableCell key={key} className="font-bold">
-                              {key.toUpperCase()}
-                            </TableCell>
+                            <th key={key} className="p-2 text-left">{key.toUpperCase()}</th>
                           ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {data.map((row, index) => (
-                        <TableRow key={index} className="hover:bg-gray-100">
+                        <tr key={index} className="border-t">
                           {Object.values(row).map((value, idx) => (
-                            <TableCell key={idx}>{value}</TableCell>
+                            <td key={idx} className="p-2">{value}</td>
                           ))}
-                        </TableRow>
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </tbody>
+                  </table>
+                </div>
               )
             ) : (
               // Add New Entry Form
-              <Box className="mt-4">
-                {Object.keys(formData).length === 0 && data.length > 0 ? (
-                  Object.keys(data[0]).map((key) => (
-                    <TextField
-                      key={key}
-                      label={key.toUpperCase()}
-                      variant="outlined"
-                      fullWidth
-                      className="mb-2 bg-white"
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, [key]: e.target.value }))
-                      }
-                    />
-                  ))
-                ) : (
-                  <p>No data structure found for form fields.</p>
-                )}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  className="mt-2"
-                  onClick={handleAddEntry}
-                >
+              <div className="bg-white p-4 rounded shadow-md">
+                {data.length > 0 && Object.keys(data[0]).map((key) => (
+                  key !== "id" && (
+                    <div key={key} className="mb-3">
+                      <label className="block text-sm font-medium">{key.toUpperCase()}</label>
+                      <input type="text"
+                             className="w-full p-2 border rounded"
+                             onChange={(e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }))} />
+                    </div>
+                  )
+                ))}
+                <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded"
+                        onClick={handleAddEntry}>
                   Add Entry
-                </Button>
-              </Box>
+                </button>
+              </div>
             )}
           </>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
