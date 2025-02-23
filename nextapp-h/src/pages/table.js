@@ -1,73 +1,185 @@
-import { useState, useEffect } from "react"; import { supabase } from "@/lib/supabase"; import FullCalendar from "@fullcalendar/react"; import dayGridPlugin from "@fullcalendar/daygrid"; import interactionPlugin from "@fullcalendar/interaction"; import { FaUserGraduate, FaChalkboardTeacher, FaClipboardList, FaCalendarAlt } from "react-icons/fa"; import { Box, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Tabs, Tab, Button, TextField, Typography, } from "@mui/material";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { FaUserGraduate, FaChalkboardTeacher, FaCalendarAlt, FaPlus, FaEye } from "react-icons/fa";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import {
+  Box,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Tabs,
+  Tab,
+  Button,
+  TextField,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 
-export default function Dashboard() { const [selectedTab, setSelectedTab] = useState("students"); const [subTab, setSubTab] = useState("view"); const [data, setData] = useState([]); const [loading, setLoading] = useState(true); const [formData, setFormData] = useState({}); const [events, setEvents] = useState([]);
+export default function Dashboard() {
+  const [selectedTab, setSelectedTab] = useState("students"); 
+  const [subTab, setSubTab] = useState("view"); 
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({});
+  const [events, setEvents] = useState([]);
 
-useEffect(() => { fetchData(); }, [selectedTab, subTab]);
+  useEffect(() => {
+    fetchData();
+  }, [selectedTab, subTab]);
 
-const fetchData = async () => { setLoading(true); const table = selectedTab; const { data, error } = await supabase.from(table).select("*"); if (error) console.error(Error fetching ${table}:, error); else setData(data || []); setLoading(false); };
+  const fetchData = async () => {
+    setLoading(true);
+    const table = selectedTab;
 
-const handleAddEntry = async () => { const table = selectedTab; const { data, error } = await supabase.from(table).insert([formData]); if (error) console.error(Error adding entry to ${table}:, error); else { setFormData({}); fetchData(); } };
+    const { data, error } = await supabase.from(table).select("*");
 
-const handleDateClick = (info) => { const title = prompt("Enter event title"); if (title) { setEvents([...events, { title, date: info.dateStr }]); } };
+    if (error) {
+      console.error(`Error fetching ${table}:`, error);
+    } else {
+      setData(data || []);
+    }
 
-return ( <Box className="flex min-h-screen bg-white text-black"> {/* Sidebar */} <Box className="w-64 bg-gray-100 p-5 space-y-4"> <Typography variant="h6" className="flex items-center space-x-2"> <FaCalendarAlt /> <span>Dashboard</span> </Typography> <nav className="space-y-3"> <button className="flex items-center space-x-2" onClick={() => setSelectedTab("calendar")}> <FaCalendarAlt /> <span>Calendar</span> </button> <button className="flex items-center space-x-2" onClick={() => setSelectedTab("students")}> <FaUserGraduate /> <span>Students</span> </button> <button className="flex items-center space-x-2" onClick={() => setSelectedTab("teachers")}> <FaChalkboardTeacher /> <span>Teachers</span> </button> <button className="flex items-center space-x-2" onClick={() => setSelectedTab("attendance")}> <FaClipboardList /> <span>Attendance</span> </button> </nav> </Box>
+    setLoading(false);
+  };
 
-{/* Main Content */}
-  <Box className="flex-1 p-5">
-    {selectedTab === "calendar" ? (
-      <FullCalendar plugins={[dayGridPlugin, interactionPlugin]} initialView="dayGridMonth" events={events} dateClick={handleDateClick} />
-    ) : (
-      <>
-        <Tabs value={subTab} onChange={(e, val) => setSubTab(val)} textColor="primary" indicatorColor="primary">
-          <Tab label="View" value="view" />
-          <Tab label="Add" value="add" />
-        </Tabs>
+  const handleAddEntry = async () => {
+    const table = selectedTab;
 
-        {subTab === "view" ? (
-          loading ? (
-            <CircularProgress className="my-5" />
-          ) : (
-            <TableContainer component={Paper} className="shadow-md">
-              <Table>
-                <TableHead className="bg-gray-200">
-                  <TableRow>
-                    {data.length > 0 && Object.keys(data[0]).map((key) => (
-                      <TableCell key={key} className="font-bold">{key.toUpperCase()}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <TableRow key={index} className="hover:bg-gray-100">
-                      {Object.values(row).map((value, idx) => (
-                        <TableCell key={idx}>{value}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )
+    const { data, error } = await supabase.from(table).insert([formData]);
+
+    if (error) {
+      console.error(`Error adding entry to ${table}:`, error);
+    } else {
+      setFormData({});
+      fetchData();
+    }
+  };
+
+  const handleDateClick = (arg) => {
+    const title = prompt("Enter event title:");
+    if (title) {
+      setEvents([...events, { title, date: arg.dateStr }]);
+    }
+  };
+
+  return (
+    <Box className="flex min-h-screen bg-white text-black">
+      {/* Sidebar */}
+      <Drawer variant="permanent" className="w-64 bg-gray-200 p-4">
+        <List>
+          <ListItem button onClick={() => setSelectedTab("calendar")}>
+            <ListItemIcon><FaCalendarAlt /></ListItemIcon>
+            <ListItemText primary="Calendar" />
+          </ListItem>
+          <ListItem button onClick={() => setSelectedTab("students")}>
+            <ListItemIcon><FaUserGraduate /></ListItemIcon>
+            <ListItemText primary="Students" />
+          </ListItem>
+          <ListItem button onClick={() => setSelectedTab("teachers")}>
+            <ListItemIcon><FaChalkboardTeacher /></ListItemIcon>
+            <ListItemText primary="Teachers" />
+          </ListItem>
+          <ListItem button onClick={() => setSelectedTab("attendance")}>
+            <ListItemIcon><FaEye /></ListItemIcon>
+            <ListItemText primary="Attendance" />
+          </ListItem>
+        </List>
+      </Drawer>
+
+      {/* Main Content */}
+      <Box className="flex-1 p-6">
+        {/* Show Calendar */}
+        {selectedTab === "calendar" ? (
+          <FullCalendar
+            plugins={[dayGridPlugin]}
+            initialView="dayGridMonth"
+            events={events}
+            dateClick={handleDateClick}
+          />
         ) : (
-          <Box className="mt-5 space-y-3">
-            {data.length > 0 &&
-              Object.keys(data[0]).map((key) => (
-                <TextField
-                  key={key}
-                  label={key.toUpperCase()}
-                  variant="outlined"
-                  fullWidth
-                  className="bg-white"
-                  onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                />
-              ))}
-            <Button variant="contained" color="primary" onClick={handleAddEntry}>Add Entry</Button>
-          </Box>
+          <>
+            {/* Tabs for View / Add */}
+            <Tabs
+              value={subTab}
+              onChange={(event, newValue) => setSubTab(newValue)}
+              className="mb-4"
+            >
+              <Tab icon={<FaEye />} label="View" value="view" />
+              <Tab icon={<FaPlus />} label="Add" value="add" />
+            </Tabs>
+
+            {/* View Data Table */}
+            {subTab === "view" ? (
+              loading ? (
+                <Box className="flex justify-center mt-4">
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <TableContainer component={Paper} className="shadow-md">
+                  <Table>
+                    <TableHead className="bg-gray-300">
+                      <TableRow>
+                        {data.length > 0 &&
+                          Object.keys(data[0]).map((key) => (
+                            <TableCell key={key} className="font-bold">
+                              {key.toUpperCase()}
+                            </TableCell>
+                          ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.map((row, index) => (
+                        <TableRow key={index} className="hover:bg-gray-100">
+                          {Object.values(row).map((value, idx) => (
+                            <TableCell key={idx}>{value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )
+            ) : (
+              // Add New Entry Form
+              <Box className="mt-4">
+                {Object.keys(formData).length === 0 && data.length > 0 ? (
+                  Object.keys(data[0]).map((key) => (
+                    <TextField
+                      key={key}
+                      label={key.toUpperCase()}
+                      variant="outlined"
+                      fullWidth
+                      className="mb-2 bg-white"
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, [key]: e.target.value }))
+                      }
+                    />
+                  ))
+                ) : (
+                  <p>No data structure found for form fields.</p>
+                )}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className="mt-2"
+                  onClick={handleAddEntry}
+                >
+                  Add Entry
+                </Button>
+              </Box>
+            )}
+          </>
         )}
-      </>
-    )}
-  </Box>
-</Box>
-
-); }
-
+      </Box>
+    </Box>
+  );
+}
