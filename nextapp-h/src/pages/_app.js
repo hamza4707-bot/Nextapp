@@ -1,18 +1,20 @@
-import { useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/globals.css";
+import Head from 'next/head';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3638251403386523";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    document.head.appendChild(script);
-  }, []);
-
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3638251403386523"
+          crossOrigin="anonymous"
+        ></script>
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 }
 
 export default MyApp;
