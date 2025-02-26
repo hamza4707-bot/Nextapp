@@ -6,7 +6,7 @@ export default function Document() {
       <Head>
         {/* Google AdSense Verification */}
         <meta name="google-site-verification" content="ca-pub-3638251403386523" />
-
+<meta name="google-site-verification" content="ZBoHvSHW-DBjbAb0pZemcekUwstEDEMRKz5H-_NQv4Q" />
         {/* AdSense Script */}
         <script
           async
