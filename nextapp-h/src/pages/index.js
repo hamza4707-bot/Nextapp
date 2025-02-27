@@ -2,58 +2,45 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Menu from '../components/Menu';
 import Footer from '../components/Footer';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 const Home = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
-  const [type, setType] = useState('');
-  const [category, setCategory] = useState('');
-  const [allArticles, setAllArticles] = useState([]);
   const [visibleEvents, setVisibleEvents] = useState(2); // Initially show 2 events
 
   useEffect(() => {
     const fetchArticles = async () => {
       const response = await fetch('/api/searchTravel');
       const articles = await response.json();
-      setAllArticles(articles);
       setFilteredArticles(articles);
     };
 
     fetchArticles();
   }, []);
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSearch();
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [keywords, location, type, category, startDate, endDate]);
-
-  const formatDate = (date) =>
-    date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
-
   const handleSearch = async () => {
     const params = new URLSearchParams();
 
-    if (startDate) params.append('startDate', formatDate(startDate));
-    if (endDate) params.append('endDate', formatDate(endDate));
     if (keywords) params.append('keywords', keywords);
     if (location) params.append('location', location);
-    if (type) params.append('type', type);
-    if (category) params.append('category', category);
 
     const response = await fetch(`/api/searchTravel?${params.toString()}`);
     const filtered = await response.json();
     setFilteredArticles(filtered);
   };
+
+  // Convert events for FullCalendar
+  const events = filteredArticles.map((article) => ({
+    title: article.title,
+    date: article.date,
+    description: article.excerpt,
+  }));
 
   return (
     <div className="">
@@ -91,30 +78,16 @@ const Home = () => {
               placeholder="Enter location"
             />
           </div>
+        </div>
 
-          {/* 📅 Start Date Picker */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Start Date</label>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                value={startDate}
-                onChange={(newDate) => setStartDate(newDate)}
-                renderInput={(params) => <input {...params} className="p-3 border border-gray-300 rounded-md text-black w-full" />}
-              />
-            </LocalizationProvider>
-          </div>
-
-          {/* 📅 End Date Picker */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">End Date</label>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                value={endDate}
-                onChange={(newDate) => setEndDate(newDate)}
-                renderInput={(params) => <input {...params} className="p-3 border border-gray-300 rounded-md text-black w-full" />}
-              />
-            </LocalizationProvider>
-          </div>
+        {/* 📅 FullCalendar */}
+        <div className="mb-8">
+          <FullCalendar
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            events={events}
+            dateClick={(info) => alert('Date clicked: ' + info.dateStr)}
+          />
         </div>
 
         {/* 📌 Filtered Events List */}
