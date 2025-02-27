@@ -1,13 +1,12 @@
 [build]
+  base = "nextapp-h"  # Set base directory to your Next.js project folder
   command = "npm run build"
   publish = ".next"  
   functions = "netlify/functions"
 
-# Use Next.js plugin for proper SSR and API routes
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Optional: Redirect everything to Next.js routing system
 [[redirects]]
   from = "/*"
   to = "/"
