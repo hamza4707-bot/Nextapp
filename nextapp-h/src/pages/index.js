@@ -1,5 +1,5 @@
- import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import Menu from '../components/Menu';
 import Footer from '../components/Footer';
 import DatePicker from 'react-datepicker';
@@ -8,189 +8,204 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 
 const Home = () => {
-const [startDate, setStartDate] = useState(null);
-const [endDate, setEndDate] = useState(null);
-const [filteredArticles, setFilteredArticles] = useState([]);
-const [keywords, setKeywords] = useState('');
-const [location, setLocation] = useState('');
-const [type, setType] = useState('');
-const [category, setCategory] = useState('');
-const [allArticles, setAllArticles] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [filteredArticles, setFilteredArticles] = useState([]);
+  const [keywords, setKeywords] = useState('');
+  const [location, setLocation] = useState('');
+  const [type, setType] = useState('');
+  const [category, setCategory] = useState('');
+  const [allArticles, setAllArticles] = useState([]);
+  const [visibleEvents, setVisibleEvents] = useState(3); // Initially show 3 events
+  const [loading, setLoading] = useState(false);
 
-useEffect(() => {
-const fetchArticles = async () => {
-const response = await fetch('/api/searchTravel');
-const articles = await response.json();
-setAllArticles(articles);
-setFilteredArticles(articles);
-};
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const response = await fetch('/api/searchTravel');
+      const articles = await response.json();
+      setAllArticles(articles);
+      setFilteredArticles(articles.slice(0, visibleEvents)); // Load the first set of events
+    };
 
-fetchArticles();
+    fetchArticles();
+  }, [visibleEvents]);
 
-}, []);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearch();
+    }, 500);
 
-useEffect(() => {
-const delayDebounceFn = setTimeout(() => {
-handleSearch();
-}, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [keywords, location, type, category, startDate, endDate]);
 
-return () => clearTimeout(delayDebounceFn);
+  const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
-}, [keywords, location, type, category, startDate, endDate]);
+  const handleSearch = async () => {
+    const params = new URLSearchParams();
 
-const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+    if (startDate) params.append("startDate", formatDate(startDate));  
+    if (endDate) params.append("endDate", formatDate(endDate));  
+    if (keywords) params.append("keywords", keywords);  
+    if (location) params.append("location", location);  
+    if (type) params.append("type", type);  
+    if (category) params.append("category", category);  
 
-const handleSearch = async () => {
-const params = new URLSearchParams();
+    const response = await fetch(`/api/searchTravel?${params.toString()}`);  
+    const filtered = await response.json();  
+    setFilteredArticles(filtered.slice(0, visibleEvents));  // Reset filtered articles based on search and visibleEvents
+  };
 
-if (startDate) params.append("startDate", formatDate(startDate));  
-if (endDate) params.append("endDate", formatDate(endDate));  
-if (keywords) params.append("keywords", keywords);  
-if (location) params.append("location", location);  
-if (type) params.append("type", type);  
-if (category) params.append("category", category);  
+  const loadMoreEvents = () => {
+    setLoading(true);
+    setVisibleEvents(prev => prev + 3);  // Load 3 more events
+    setLoading(false);
+  };
 
-const response = await fetch(`/api/searchTravel?${params.toString()}`);  
-const filtered = await response.json();  
-setFilteredArticles(filtered);
+  return (
+    <div className="">
+      <Menu />
+      <div className="container mx-auto mt-30 px-2 ml-5">
+        <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
+          Looking for a new adventure this weekend in Orange County, California?
+        </h1>
+        <h3 className="text-2xl font-bold mb-8 text-black text-center opacity-80">
+          Search for an adventure below!
+        </h3>
 
-};
+        {/* 🔍 Search Filters */}
+        <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* 🔎 Keyword Search */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Keyword</label>
+            <input
+              type="text"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+              placeholder="Search for events"
+            />
+          </div>
 
-return (
-<div className="">
-<Menu />
-<div className="container mx-auto mt-30 px-2 ml-5">
-<h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
-Looking for a new adventure this weekend in Orange County, California?
-</h1>
-<h3 className="text-2xl font-bold mb-8 text-black text-center opacity-80">
-Search for an adventure below!
-</h3>
+          {/* 📍 Location Filter */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+              placeholder="Enter location"
+            />
+          </div>
 
-{/* 🔍 Search Filters */}  
-    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">  
-      {/* 🔎 Keyword Search */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">Keyword</label>  
-        <input  
-          type="text"  
-          value={keywords}  
-          onChange={(e) => setKeywords(e.target.value)}  
-          className="p-3 border border-gray-300 rounded-md text-black"  
-          placeholder="Search for events"  
-        />  
-      </div>  
+          {/* 📅 Start Date Picker */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Start Date</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              className="p-3 border border-gray-300 rounded-md text-black w-full"
+              dateFormat="dd-MMM-yyyy"
+              placeholderText="Select start date"
+            />
+          </div>
 
-      {/* 📍 Location Filter */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">Location</label>  
-        <input  
-          type="text"  
-          value={location}  
-          onChange={(e) => setLocation(e.target.value)}  
-          className="p-3 border border-gray-300 rounded-md text-black"  
-          placeholder="Enter location"  
-        />  
-      </div>  
+          {/* 📅 End Date Picker */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">End Date</label>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              className="p-3 border border-gray-300 rounded-md text-black w-full"
+              dateFormat="dd-MMM-yyyy"
+              placeholderText="Select end date"
+            />
+          </div>
 
-      {/* 📅 Start Date Picker */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">Start Date</label>  
-        <DatePicker  
-          selected={startDate}  
-          onChange={(date) => setStartDate(date)}  
-          className="p-3 border border-gray-300 rounded-md text-black w-full"  
-          dateFormat="dd-MMM-yyyy"  
-          placeholderText="Select start date"  
-        />  
-      </div>  
+          {/* 🏷️ Type Filter */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Type</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+            >
+              <option value="">Select Type</option>
+              <option value="adventure">Adventure</option>
+              <option value="relaxation">Relaxation</option>
+              <option value="cultural">Cultural</option>
+              <option value="sports">Sports</option>
+            </select>
+          </div>
 
-      {/* 📅 End Date Picker */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">End Date</label>  
-        <DatePicker  
-          selected={endDate}  
-          onChange={(date) => setEndDate(date)}  
-          className="p-3 border border-gray-300 rounded-md text-black w-full"  
-          dateFormat="dd-MMM-yyyy"  
-          placeholderText="Select end date"  
-        />  
-      </div>  
+          {/* 🏷️ Category Filter */}
+          <div className="flex flex-col">
+            <label className="mb-2 text-sm text-gray-600">Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="p-3 border border-gray-300 rounded-md text-black"
+            >
+              <option value="">Select Category</option>
+              <option value="hiking">Hiking</option>
+              <option value="beach">Beach</option>
+              <option value="museum">Museum</option>
+              <option value="concert">Concert</option>
+            </select>
+          </div>
+        </div>
 
-      {/* 🏷️ Type Filter */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">Type</label>  
-        <select  
-          value={type}  
-          onChange={(e) => setType(e.target.value)}  
-          className="p-3 border border-gray-300 rounded-md text-black"  
-        >  
-          <option value="">Select Type</option>  
-          <option value="adventure">Adventure</option>  
-          <option value="relaxation">Relaxation</option>  
-          <option value="cultural">Cultural</option>  
-          <option value="sports">Sports</option>  
-        </select>  
-      </div>  
+        {/* 📌 Filtered Events List */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredArticles.map((article) => (
+            <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <img src={article.image} alt={article.title} className="w-full h-56 object-cover rounded-md mb-4" />
 
-      {/* 🏷️ Category Filter */}  
-      <div className="flex flex-col">  
-        <label className="mb-2 text-sm text-gray-600">Category</label>  
-        <select  
-          value={category}  
-          onChange={(e) => setCategory(e.target.value)}  
-          className="p-3 border border-gray-300 rounded-md text-black"  
-        >  
-          <option value="">Select Category</option>  
-          <option value="hiking">Hiking</option>  
-          <option value="beach">Beach</option>  
-          <option value="museum">Museum</option>  
-          <option value="concert">Concert</option>  
-        </select>  
-      </div>  
-    </div>  
+                <h5 className="capitalize text-black text-2xl font-semibold mb-2">{article.title}</h5>
 
-    {/* 📌 Filtered Events List */}  
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">  
-      {filteredArticles.map((article) => (  
-        <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">  
-          <div className="p-6">  
-            <img src={article.image} alt={article.title} className="w-full h-56 object-cover rounded-md mb-4" />  
+                {article.tag && (
+                  <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                    {article.tag}
+                  </span>
+                )}
 
-            <h5 className=" capitalize text-black text-2xl font-semibold mb-2">{article.title}</h5>  
+                <p className="text-gray-700 mb-4">{article.excerpt}</p>
 
-            {article.tag && (  
-              <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">  
-                {article.tag}  
-              </span>  
-            )}  
+                <p className="text-gray-700 mb-2">
+                  <FontAwesomeIcon icon={faClock} className="mr-2" />
+                  {article.date}
+                </p>
+                <p className="text-gray-700 mb-4">
+                  <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
+                  {article.location}
+                </p>
 
-            <p className="text-gray-700 mb-4">{article.excerpt}</p>  
+                <Link href={`/events/${article.id}`}>
+                  <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">
+                    View Event
+                  </span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
 
-            <p className="text-gray-700 mb-2">  
-              <FontAwesomeIcon icon={faClock} className="mr-2" />  
-              {article.date}  
-            </p>  
-            <p className="text-gray-700 mb-4">  
-              <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />  
-              {article.location}  
-            </p>  
+        {/* Load More Button */}
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={loadMoreEvents}
+            className={`bg-white text-black font-semibold px-6 py-3 rounded-lg shadow-md transition-all hover:shadow-xl hover:bg-gray-100 border border-gray-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
+      </div>
 
-            <Link href={`/events/${article.id}`}>  
-              <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">  
-                View Event  
-              </span>  
-            </Link>  
-          </div>  
-        </div>  
-      ))}  
-    </div>  
-  </div>  
-  <Footer />  
-</div>
-
-);
+      <Footer />
+    </div>
+  );
 };
 
 export default Home;
-
