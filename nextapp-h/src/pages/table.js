@@ -1,18 +1,7 @@
-import { useState, useEffect } from "react"; import { supabase } from "@/lib/supabase"; import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Tabs, Tab, Button, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material"; import { Home, School, Event, People, Add } from "@mui/icons-material"; import FullCalendar from "@fullcalendar/react"; import dayGridPlugin from "@fullcalendar/daygrid";
-
-export default function Dashboard() { const [selectedTab, setSelectedTab] = useState("students"); const [subTab, setSubTab] = useState("view"); const [data, setData] = useState([]); const [loading, setLoading] = useState(false); const [formData, setFormData] = useState({}); const [events, setEvents] = useState([]); const [openDialog, setOpenDialog] = useState(false); const [eventData, setEventData] = useState({ teacher: "", title: "", date: "" });
-
-useEffect(() => { fetchData(); }, [selectedTab]);
-
-async function fetchData() { setLoading(true); const { data, error } = await supabase.from(selectedTab).select("*"); if (error) console.error(error); else setData(data || []); setLoading(false); }
-
-async function handleAddEntry() { const { error } = await supabase.from(selectedTab).insert([formData]); if (error) console.error(error); else { setFormData({}); fetchData(); } }
-
-function handleDateClick(info) { setEventData({ ...eventData, date: info.dateStr }); setOpenDialog(true); }
-
-async function handleAddEvent() { setEvents([...events, eventData]); setOpenDialog(false); }
-
-function handleCellDoubleClick(row) { setEventData({ teacher: row.name, title: "", date: "" }); setOpenDialog(true); }
-
-return ( <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f5f5" }}> <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0 }}> <List> {["Calendar", "Students", "Teachers", "Attendance"].map((text, index) => ( <ListItem button key={text} onClick={() => setSelectedTab(text.toLowerCase())}> <ListItemIcon> {index === 0 ? <Event /> : index === 1 ? <People /> : <School />} </ListItemIcon> <ListItemText primary={text} /> </ListItem> ))} </List> </Drawer> <Box sx={{ flexGrow: 1, p: 3 }}> <AppBar position="static" color="default"> <Toolbar> <Typography variant="h6">Dashboard</Typography> </Toolbar> </AppBar> {selectedTab === "calendar" ? ( <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" dateClick={handleDateClick} events={events} /> ) : ( <> <Tabs value={subTab} onChange={(e, val) => setSubTab(val)}> <Tab label="View" value="view" /> <Tab label="Add" value="add" /> </Tabs> {subTab === "view" ? ( loading ? ( <CircularProgress /> ) : ( <TableContainer component={Paper}> <Table> <TableHead> <TableRow> {data.length > 0 && Object.keys(data[0]).map((key) => <TableCell key={key}>{key.toUpperCase()}</TableCell>)} </TableRow> </TableHead> <TableBody> {data.map((row, index) => ( <TableRow key={index} onDoubleClick={() => handleCellDoubleClick(row)}> {Object.values(row).map((value, idx) => ( <TableCell key={idx}>{value}</TableCell> ))} </TableRow> ))} </TableBody> </Table> </TableContainer> ) ) : ( <Box> {Object.keys(data[0] || {}).map((key) => ( <TextField key={key} label={key.toUpperCase()} fullWidth sx={{ mb: 2 }} onChange={(e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }))} /> ))} <Button variant="contained" startIcon={<Add />} onClick={handleAddEntry}>Add Entry</Button> </Box> )} </> )} </Box> <Dialog open={openDialog} onClose={() => setOpenDialog(false)}> <DialogTitle>Add Event</DialogTitle> <DialogContent> <TextField label="Teacher" fullWidth sx={{ mb: 2 }} value={eventData.teacher} disabled /> <TextField label="Event Title" fullWidth sx={{ mb: 2 }} onChange={(e) => setEventData({ ...eventData, title: e.target.value })} /> <TextField label="Date" fullWidth sx={{ mb: 2 }} value={eventData.date} disabled /> </DialogContent> <DialogActions> <Button onClick={() => setOpenDialog(false)}>Cancel</Button> <Button variant="contained" onClick={handleAddEvent}>Add Event</Button> </DialogActions> </Dialog> </Box> ); }
-
+export default function Hello() {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px", fontSize: "24px" }}>
+      <h1>Hello</h1>
+    </div>
+  );
+}
