@@ -1,11 +1,15 @@
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Menu from '../components/Menu';
 import Footer from '../components/Footer';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+
+// MUI imports
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 
 const Home = () => {
   const [startDate, setStartDate] = useState(null);
@@ -36,7 +40,8 @@ const Home = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [keywords, location, type, category, startDate, endDate]);
 
-  const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+  const formatDate = (date) =>
+    date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
   const handleSearch = async () => {
     const params = new URLSearchParams();
@@ -65,87 +70,67 @@ const Home = () => {
         </h3>
 
         {/* 🔍 Search Filters */}
-        <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* 🔎 Keyword Search */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Keyword</label>
-            <input
-              type="text"
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* 🔎 Keyword Search */}
+            <TextField
+              label="Keyword"
+              variant="outlined"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md text-black"
-              placeholder="Search for events"
+              className="w-full"
             />
-          </div>
 
-          {/* 📍 Location Filter */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Location</label>
-            <input
-              type="text"
+            {/* 📍 Location Filter */}
+            <TextField
+              label="Location"
+              variant="outlined"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md text-black"
-              placeholder="Enter location"
+              className="w-full"
             />
-          </div>
 
-          {/* 📅 Start Date Picker */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Start Date</label>
+            {/* 📅 Start Date Picker */}
             <DatePicker
-              selected={startDate}
+              label="Start Date"
+              value={startDate}
               onChange={(date) => setStartDate(date)}
-              className="p-3 border border-gray-300 rounded-md text-black w-full"
-              dateFormat="dd-MMM-yyyy"
-              placeholderText="Select start date"
+              renderInput={(params) => <TextField {...params} variant="outlined" className="w-full" />}
             />
-          </div>
 
-          {/* 📅 End Date Picker */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">End Date</label>
+            {/* 📅 End Date Picker */}
             <DatePicker
-              selected={endDate}
+              label="End Date"
+              value={endDate}
               onChange={(date) => setEndDate(date)}
-              className="p-3 border border-gray-300 rounded-md text-black w-full"
-              dateFormat="dd-MMM-yyyy"
-              placeholderText="Select end date"
+              renderInput={(params) => <TextField {...params} variant="outlined" className="w-full" />}
             />
-          </div>
 
-          {/* 🏷️ Type Filter */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Type</label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md text-black"
-            >
-              <option value="">Select Type</option>
-              <option value="adventure">Adventure</option>
-              <option value="relaxation">Relaxation</option>
-              <option value="cultural">Cultural</option>
-              <option value="sports">Sports</option>
-            </select>
-          </div>
+            {/* 🏷️ Type Filter */}
+            <FormControl variant="outlined" className="w-full">
+              <InputLabel>Type</InputLabel>
+              <Select value={type} onChange={(e) => setType(e.target.value)} label="Type">
+                <MenuItem value="">Select Type</MenuItem>
+                <MenuItem value="adventure">Adventure</MenuItem>
+                <MenuItem value="relaxation">Relaxation</MenuItem>
+                <MenuItem value="cultural">Cultural</MenuItem>
+                <MenuItem value="sports">Sports</MenuItem>
+              </Select>
+            </FormControl>
 
-          {/* 🏷️ Category Filter */}
-          <div className="flex flex-col">
-            <label className="mb-2 text-sm text-gray-600">Category</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md text-black"
-            >
-              <option value="">Select Category</option>
-              <option value="hiking">Hiking</option>
-              <option value="beach">Beach</option>
-              <option value="museum">Museum</option>
-              <option value="concert">Concert</option>
-            </select>
+            {/* 🏷️ Category Filter */}
+            <FormControl variant="outlined" className="w-full">
+              <InputLabel>Category</InputLabel>
+              <Select value={category} onChange={(e) => setCategory(e.target.value)} label="Category">
+                <MenuItem value="">Select Category</MenuItem>
+                <MenuItem value="hiking">Hiking</MenuItem>
+                <MenuItem value="beach">Beach</MenuItem>
+                <MenuItem value="museum">Museum</MenuItem>
+                <MenuItem value="concert">Concert</MenuItem>
+              </Select>
+            </FormControl>
           </div>
-        </div>
+        </LocalizationProvider>
 
         {/* 📌 Filtered Events List */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
