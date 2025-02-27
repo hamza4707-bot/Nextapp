@@ -1,6 +1,6 @@
 {
-  "name": "nextjs-blog-example",
-  "version": "0.1.0",
+  "name": "nextapp",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,30 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.3",
-    "bootstrap": "^5.3.3",
-    "date-fns": "3.6.0",
-    "next": "15.1.6",
-    "react": "^19.0.0",
-    "react-datepicker": "^7.6.0",
-    "react-dom": "^19.0.0",
-    "react-icons": "^5.4.0",
-    "@fortawesome/react-fontawesome": "^0.1.17",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@mui/material": "^5.0.0",
-    "@mui/icons-material": "^5.0.0",
-    "@emotion/react": "^11.10.0",
+    "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.10.0",
-    "@fullcalendar/react": "^6.1.11",
-    "@fullcalendar/daygrid": "^6.1.11",
-    "@fullcalendar/interaction": "^6.1.11",
-    "framer-motion": "beta",
-    "@mui/x-date-pickers": "^6.0.0",
-    "@mui/lab": "^5.0.0",
-    "@date-io/date-fns": "^3.0.0"
+    "@mui/material": "^5.14.0",
+    "@mui/system": "^5.14.0",
+    "@mui/x-date-pickers": "^6.20.2",
+    "@date-io/date-fns": "^3.2.0",
+    "date-fns": "^3.6.0",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "eslint": "8.50.0",
+    "eslint-config-next": "14.0.0"
+  },
+  "overrides": {
+    "date-fns": "^3.6.0"
   }
 }
