@@ -5,9 +5,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { startDate, endDate, keywords, location, type, category } = req.query;
+  const { startDate, endDate, keywords, location, type, category, limit = 2, offset = 0 } = req.query;
 
-  let query = supabase.from('events').select('*'); // Select everything, including `tag`
+  let query = supabase.from('events').select('*');
 
   if (startDate && endDate) {
     query = query.gte('date', startDate).lte('date', endDate);
@@ -22,16 +22,17 @@ export default async function handler(req, res) {
   }
 
   if (type) {
-    query = query.ilike('type', `%${type}%`); // Keep 'type' as is
-}
+    query = query.ilike('type', `%${type}%`);
+  }
 
-if (category) {
-    query = query.ilike('category', `%${category}%`); // Use 'cat' instead of 'category'
-}
+  if (category) {
+    query = query.ilike('category', `%${category}%`);
+  }
+
+  // Pagination: Fetch only the required number of events
+  query = query.range(Number(offset), Number(offset) + Number(limit) - 1);
 
   const { data, error } = await query;
-
-  console.log("Fetched Events:", data); // Debugging ✅
 
   if (error) {
     console.error("Supabase Error:", error);
