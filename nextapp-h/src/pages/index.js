@@ -110,13 +110,13 @@ const Home = () => {
       </button>
 
       {/* 📌 Events List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 text-black">
         {events.map((event) => (
-          <div key={event.id} className="border p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold">{event.title}</h3>
-            <p className="text-gray-600">{event.description}</p>
-            <p className="text-sm"><strong>Location:</strong> {event.location}</p>
-            <p className="text-sm"><strong>Date:</strong> {event.date}</p>
+          <div key={event.id} className="border p-4 rounded-lg shadow-md text-black">
+            <h3 className="text-lg font-semibold text-black">{event.title}</h3>
+            <p className="text-black">{event.description}</p>
+            <p className="text-sm text-black"><strong>Location:</strong> {event.location}</p>
+            <p className="text-sm text-black"><strong>Date:</strong> {event.date}</p>
           </div>
         ))}
       </div>
