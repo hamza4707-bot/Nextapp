@@ -10,49 +10,43 @@ import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 const Home = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [filteredArticles, setFilteredArticles] = useState([]);
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
   const [type, setType] = useState('');
   const [category, setCategory] = useState('');
   const [allArticles, setAllArticles] = useState([]);
-  const [visibleEvents, setVisibleEvents] = useState(3); // Initially show 3 events
+  const [filteredArticles, setFilteredArticles] = useState([]);
+  const [visibleEvents, setVisibleEvents] = useState(2); // Initially show 2 events
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Initially fetch articles
-    const fetchArticles = async () => {
-      const response = await fetch('/api/searchTravel');
-      const articles = await response.json();
-      setAllArticles(articles);
-      setFilteredArticles(articles.slice(0, visibleEvents)); // Show only initial number of events
-    };
-
-    fetchArticles();
-  }, []);
-
-  useEffect(() => {
-    // When visibleEvents changes, slice allArticles to show the correct number of articles
-    setFilteredArticles(allArticles.slice(0, visibleEvents));
-  }, [visibleEvents, allArticles]);
 
   const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
+  const fetchArticles = async (params = {}) => {
+    setLoading(true);
+
+    // Fetch articles based on the provided filters and pagination offset
+    const response = await fetch(`/api/searchTravel?${new URLSearchParams(params)}`);
+    const articles = await response.json();
+
+    setLoading(false);
+    return articles;
+  };
+
   const handleSearch = async () => {
-    const params = new URLSearchParams();
+    const params = {
+      startDate: startDate ? formatDate(startDate) : '',
+      endDate: endDate ? formatDate(endDate) : '',
+      keywords: keywords,
+      location: location,
+      type: type,
+      category: category,
+      offset: 0,  // Reset the offset for the new search
+    };
 
-    if (startDate) params.append("startDate", formatDate(startDate));  
-    if (endDate) params.append("endDate", formatDate(endDate));  
-    if (keywords) params.append("keywords", keywords);  
-    if (location) params.append("location", location);  
-    if (type) params.append("type", type);  
-    if (category) params.append("category", category);  
-
-    const response = await fetch(`/api/searchTravel?${params.toString()}`);  
-    const filtered = await response.json();  
-    setAllArticles(filtered);  // Update allArticles based on search results
-    setVisibleEvents(3);  // Reset to show 3 items on search
-    setFilteredArticles(filtered.slice(0, 3)); // Show only first 3 events from filtered results
+    const filtered = await fetchArticles(params);
+    setAllArticles(filtered);
+    setFilteredArticles(filtered.slice(0, 2)); // Show only the first 2 filtered events
+    setVisibleEvents(2); // Reset the number of visible events
   };
 
   const loadMoreEvents = async () => {
@@ -60,28 +54,34 @@ const Home = () => {
 
     // Calculate the offset based on the number of currently visible events
     const offset = visibleEvents;
+    
+    const params = {
+      startDate: startDate ? formatDate(startDate) : '',
+      endDate: endDate ? formatDate(endDate) : '',
+      keywords: keywords,
+      location: location,
+      type: type,
+      category: category,
+      offset: offset, // Include the offset to get the next set of articles
+    };
 
-    // Fetch more events from the API with the current filters
-    const params = new URLSearchParams();
-    if (startDate) params.append("startDate", formatDate(startDate));
-    if (endDate) params.append("endDate", formatDate(endDate));
-    if (keywords) params.append("keywords", keywords);
-    if (location) params.append("location", location);
-    if (type) params.append("type", type);
-    if (category) params.append("category", category);
-    params.append("offset", offset);  // Add offset for pagination
-
-    const response = await fetch(`/api/searchTravel?${params.toString()}`);
-    const newArticles = await response.json();
-
-    // Add the newly fetched articles to the existing articles
-    setAllArticles((prev) => [...prev, ...newArticles]);
-
-    // Update the visible events
-    setVisibleEvents((prev) => prev + 3);
-
+    const newArticles = await fetchArticles(params);
+    setAllArticles((prev) => [...prev, ...newArticles]); // Append new articles to the existing ones
+    setFilteredArticles((prev) => [...prev, ...newArticles.slice(0, 3)]); // Show 3 more articles
+    setVisibleEvents((prev) => prev + 3); // Update the visible events count
     setLoading(false);
   };
+
+  useEffect(() => {
+    // Initially fetch articles
+    const initialFetch = async () => {
+      const initialArticles = await fetchArticles();
+      setAllArticles(initialArticles);
+      setFilteredArticles(initialArticles.slice(0, 2)); // Initially show 2 articles
+    };
+
+    initialFetch();
+  }, []);
 
   return (
     <div>
@@ -183,17 +183,13 @@ const Home = () => {
             <div key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="p-6">
                 <img src={article.image} alt={article.title} className="w-full h-56 object-cover rounded-md mb-4" />
-
                 <h5 className="capitalize text-black text-2xl font-semibold mb-2">{article.title}</h5>
-
                 {article.tag && (
                   <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
                     {article.tag}
                   </span>
                 )}
-
                 <p className="text-gray-700 mb-4">{article.excerpt}</p>
-
                 <p className="text-gray-700 mb-2">
                   <FontAwesomeIcon icon={faClock} className="mr-2" />
                   {article.date}
@@ -202,7 +198,6 @@ const Home = () => {
                   <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
                   {article.location}
                 </p>
-
                 <Link href={`/events/${article.id}`}>
                   <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">
                     View Event
