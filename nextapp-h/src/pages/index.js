@@ -19,20 +19,17 @@ const Home = () => {
   const [visibleEvents, setVisibleEvents] = useState(3); // Initially show 3 events
   const [loading, setLoading] = useState(false);
 
-  // Fetch articles on initial load or when filters change
   useEffect(() => {
     const fetchArticles = async () => {
       const response = await fetch('/api/searchTravel');
       const articles = await response.json();
       setAllArticles(articles);
-      // On first load, show the first 3 articles
-      setFilteredArticles(articles.slice(0, visibleEvents));
+      setFilteredArticles(articles.slice(0, visibleEvents)); // Load the first set of events
     };
 
     fetchArticles();
-  }, []);
+  }, [visibleEvents]);
 
-  // Handle search and filter logic
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleSearch();
@@ -41,10 +38,8 @@ const Home = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [keywords, location, type, category, startDate, endDate]);
 
-  // Format date for the API request
   const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
-  // Handle the search request based on filter values
   const handleSearch = async () => {
     const params = new URLSearchParams();
 
@@ -55,28 +50,29 @@ const Home = () => {
     if (type) params.append("type", type);  
     if (category) params.append("category", category);  
 
-    const response = await fetch(`/api/searchTravel?${params.toString()}`);
-    const filtered = await response.json();
-    setAllArticles(filtered);  // Update allArticles when search filters are applied
-    setFilteredArticles(filtered.slice(0, visibleEvents));  // Paginate based on visibleEvents
+    const response = await fetch(`/api/searchTravel?${params.toString()}`);  
+    const filtered = await response.json();  
+    setFilteredArticles(filtered.slice(0, visibleEvents));  // Reset filtered articles based on search and visibleEvents
   };
 
-  // Function to load more events
   const loadMoreEvents = () => {
     setLoading(true);
-    const newVisibleEvents = visibleEvents + 3;
-    setVisibleEvents(newVisibleEvents);  // Increase visible events by 3
+    setVisibleEvents((prev) => prev + 3);  // Load 3 more events
     setLoading(false);
   };
 
-  // Update filteredArticles when visibleEvents changes
   useEffect(() => {
-    const newArticles = allArticles.slice(0, visibleEvents);
-    setFilteredArticles(newArticles);
-  }, [visibleEvents, allArticles]);  // Re-run when visibleEvents or allArticles change
+    // Apply pagination logic for filtered events after visibleEvents is updated
+    const loadPaginatedArticles = () => {
+      const newArticles = allArticles.slice(0, visibleEvents);
+      setFilteredArticles(newArticles);
+    };
+
+    loadPaginatedArticles();
+  }, [visibleEvents, allArticles]); // When visibleEvents or allArticles change, update filteredArticles
 
   return (
-    <div className="">
+    <div>
       <Menu />
       <div className="container mx-auto mt-30 px-2 ml-5">
         <h1 className="text-4xl font-bold mb-8 text-black text-center opacity-80">
@@ -196,4 +192,30 @@ const Home = () => {
                 </p>
 
                 <Link href={`/events/${article.id}`}>
-                  <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue
+                  <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">
+                    View Event
+                  </span>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Load More Button */}
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={loadMoreEvents}
+            className={`bg-white text-black font-semibold px-6 py-3 rounded-lg shadow-md transition-all hover:shadow-xl hover:bg-gray-100 border border-gray-300 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Home;
