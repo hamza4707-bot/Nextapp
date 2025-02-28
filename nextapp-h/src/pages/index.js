@@ -61,6 +61,16 @@ const Home = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    // Apply pagination logic for filtered events after visibleEvents is updated
+    const loadPaginatedArticles = () => {
+      const newArticles = allArticles.slice(0, visibleEvents);
+      setFilteredArticles(newArticles);
+    };
+
+    loadPaginatedArticles();
+  }, [visibleEvents, allArticles]); // When visibleEvents or allArticles change, update filteredArticles
+
   return (
     <div className="">
       <Menu />
