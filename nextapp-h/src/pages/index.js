@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 const Home = () => {
   const [startDate, setStartDate] = useState(null);
@@ -13,9 +16,8 @@ const Home = () => {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const limit = 6; // Number of events to load
+  const limit = 6;
 
-  // Fetch events from API
   const fetchEvents = async (reset = false) => {
     setLoading(true);
 
@@ -70,7 +72,7 @@ const Home = () => {
           className="border p-2 rounded-md"
         />
 
-        {/* 📅 Date Pickers (Start & End Date) */}
+        {/* 📅 Date Pickers */}
         <DatePicker
           selected={startDate}
           onChange={(date) => setStartDate(date)}
@@ -101,7 +103,7 @@ const Home = () => {
         </select>
       </div>
 
-      {/* Search Button */}
+      {/* 🔍 Search Button */}
       <button 
         onClick={() => fetchEvents(true)}
         className="bg-blue-500 text-white px-4 py-2 rounded-md"
@@ -109,14 +111,40 @@ const Home = () => {
         Search
       </button>
 
-      {/* 📌 Events List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 text-black">
+      {/* 📌 Enhanced Events List */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {events.map((event) => (
-          <div key={event.id} className="border p-4 rounded-lg shadow-md text-black">
-            <h3 className="text-lg font-semibold text-black">{event.title}</h3>
-            <p className="text-black">{event.description}</p>
-            <p className="text-sm text-black"><strong>Location:</strong> {event.location}</p>
-            <p className="text-sm text-black"><strong>Date:</strong> {event.date}</p>
+          <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="p-6">
+              {event.image && (
+                <img src={event.image} alt={event.title} className="w-full h-56 object-cover rounded-md mb-4" />
+              )}
+
+              <h5 className="capitalize text-black text-2xl font-semibold mb-2">{event.title}</h5>
+
+              {event.tag && (
+                <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                  {event.tag}
+                </span>
+              )}
+
+              <p className="text-gray-700 mb-4">{event.description}</p>
+
+              <p className="text-gray-700 mb-2">
+                <FontAwesomeIcon icon={faClock} className="mr-2" />
+                {event.date}
+              </p>
+              <p className="text-gray-700 mb-4">
+                <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
+                {event.location}
+              </p>
+
+              <Link href={`/events/${event.id}`}>
+                <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer">
+                  View Event
+                </span>
+              </Link>
+            </div>
           </div>
         ))}
       </div>
