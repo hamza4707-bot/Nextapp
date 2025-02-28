@@ -24,19 +24,15 @@ const Home = () => {
       const response = await fetch('/api/searchTravel');
       const articles = await response.json();
       setAllArticles(articles);
-      setFilteredArticles(articles.slice(0, visibleEvents)); // Load the first set of events
     };
 
     fetchArticles();
-  }, [visibleEvents]);
+  }, []);
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSearch();
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [keywords, location, type, category, startDate, endDate]);
+    // When visibleEvents changes, slice allArticles to show the correct number of articles
+    setFilteredArticles(allArticles.slice(0, visibleEvents));
+  }, [visibleEvents, allArticles]);
 
   const formatDate = (date) => date ? date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
 
@@ -52,24 +48,17 @@ const Home = () => {
 
     const response = await fetch(`/api/searchTravel?${params.toString()}`);  
     const filtered = await response.json();  
-    setFilteredArticles(filtered.slice(0, visibleEvents));  // Reset filtered articles based on search and visibleEvents
+    setAllArticles(filtered);  // Update allArticles based on search results
+    setVisibleEvents(3);  // Reset to show 3 items on search
   };
 
   const loadMoreEvents = () => {
     setLoading(true);
-    setVisibleEvents((prev) => prev + 3);  // Load 3 more events
-    setLoading(false);
+    setTimeout(() => {
+      setVisibleEvents((prev) => prev + 3); // Load 3 more events
+      setLoading(false);
+    }, 500);
   };
-
-  useEffect(() => {
-    // Apply pagination logic for filtered events after visibleEvents is updated
-    const loadPaginatedArticles = () => {
-      const newArticles = allArticles.slice(0, visibleEvents);
-      setFilteredArticles(newArticles);
-    };
-
-    loadPaginatedArticles();
-  }, [visibleEvents, allArticles]); // When visibleEvents or allArticles change, update filteredArticles
 
   return (
     <div>
