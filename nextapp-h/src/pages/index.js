@@ -20,10 +20,12 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Initially fetch articles
     const fetchArticles = async () => {
       const response = await fetch('/api/searchTravel');
       const articles = await response.json();
       setAllArticles(articles);
+      setFilteredArticles(articles.slice(0, visibleEvents)); // Show only initial number of events
     };
 
     fetchArticles();
@@ -50,6 +52,7 @@ const Home = () => {
     const filtered = await response.json();  
     setAllArticles(filtered);  // Update allArticles based on search results
     setVisibleEvents(3);  // Reset to show 3 items on search
+    setFilteredArticles(filtered.slice(0, 3)); // Show only first 3 events from filtered results
   };
 
   const loadMoreEvents = async () => {
@@ -58,7 +61,7 @@ const Home = () => {
     // Calculate the offset based on the number of currently visible events
     const offset = visibleEvents;
 
-    // Fetch more events from the API
+    // Fetch more events from the API with the current filters
     const params = new URLSearchParams();
     if (startDate) params.append("startDate", formatDate(startDate));
     if (endDate) params.append("endDate", formatDate(endDate));
