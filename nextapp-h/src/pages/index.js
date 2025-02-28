@@ -52,12 +52,32 @@ const Home = () => {
     setVisibleEvents(3);  // Reset to show 3 items on search
   };
 
-  const loadMoreEvents = () => {
+  const loadMoreEvents = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setVisibleEvents((prev) => prev + 3); // Load 3 more events
-      setLoading(false);
-    }, 500);
+
+    // Calculate the offset based on the number of currently visible events
+    const offset = visibleEvents;
+
+    // Fetch more events from the API
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", formatDate(startDate));
+    if (endDate) params.append("endDate", formatDate(endDate));
+    if (keywords) params.append("keywords", keywords);
+    if (location) params.append("location", location);
+    if (type) params.append("type", type);
+    if (category) params.append("category", category);
+    params.append("offset", offset);  // Add offset for pagination
+
+    const response = await fetch(`/api/searchTravel?${params.toString()}`);
+    const newArticles = await response.json();
+
+    // Add the newly fetched articles to the existing articles
+    setAllArticles((prev) => [...prev, ...newArticles]);
+
+    // Update the visible events
+    setVisibleEvents((prev) => prev + 3);
+
+    setLoading(false);
   };
 
   return (
