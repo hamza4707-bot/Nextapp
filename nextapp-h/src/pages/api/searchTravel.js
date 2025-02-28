@@ -5,38 +5,31 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { keywords, location, type, category, date, limit = 5, offset = 0 } = req.query;
-
-  console.log("Received Params:", { keywords, location, type, category, date, limit, offset });
+  const { startDate, endDate, keywords, location, type, category, limit = 6, offset = 0 } = req.query;
 
   let query = supabase.from('events').select('*');
 
+  if (startDate && endDate) {
+    query = query.gte('date', startDate).lte('date', endDate);
+  }
+
   if (keywords) {
-    console.log("Filtering by keywords:", keywords);
-    query = query.or(`(title.ilike.%${keywords}%,description.ilike.%${keywords}%)`);
+    query = query.or(`title.ilike.%${keywords}%, description.ilike.%${keywords}%`);
   }
 
   if (location) {
-    console.log("Filtering by location:", location);
     query = query.ilike('location', `%${location}%`);
   }
 
   if (type) {
-    console.log("Filtering by type:", type);
     query = query.ilike('type', `%${type}%`);
   }
 
   if (category) {
-    console.log("Filtering by category:", category);
     query = query.ilike('category', `%${category}%`);
   }
 
-  if (date) {
-    console.log("Filtering by date:", date);
-    query = query.ilike('date', `%${date}%`);
-  }
-
-  // Pagination
+  // Pagination: Fetch only the required number of events
   query = query.range(Number(offset), Number(offset) + Number(limit) - 1);
 
   const { data, error } = await query;
@@ -46,6 +39,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 
-  console.log("Query Result:", data);
   return res.status(200).json(data);
 }
