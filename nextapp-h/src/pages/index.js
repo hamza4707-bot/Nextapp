@@ -159,7 +159,7 @@ const Home = () => {
 
               <p className="text-gray-700 mb-2">
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
-                {event.date}
+                {event.start_date} + "to" + {event.end_date}
               </p>
               <p className="text-gray-700 mb-4">
                 <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
