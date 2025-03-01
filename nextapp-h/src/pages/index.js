@@ -26,6 +26,7 @@ const Home = () => {
       location,
       type,
       category,
+      // Ensure startDate and endDate are formatted in 'YYYY-MM-DD' format for the API
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       offset: reset ? 0 : offset,
@@ -92,7 +93,7 @@ const Home = () => {
             }}
             className="border p-2 rounded-md w-full"
             placeholderText="Start Date"
-            dateFormat="dd-MM-yyyy"
+            dateFormat="dd-MM-yyyy" // Keep this format for UI
           />
         </div>
 
@@ -103,7 +104,7 @@ const Home = () => {
             onChange={(date) => setEndDate(date)}
             className="border p-2 rounded-md w-full"
             placeholderText="End Date"
-            dateFormat="dd-MM-yyyy"
+            dateFormat="dd-MM-yyyy" // Keep this format for UI
             minDate={startDate} // Prevent selecting an end date before start date
           />
         </div>
