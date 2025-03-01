@@ -18,20 +18,22 @@ const Home = () => {
 
   const limit = 6;
 
-  
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+  };
 
   const fetchEvents = async (reset = false) => {
     setLoading(true);
-
-   
 
     const params = new URLSearchParams({
       keywords,
       location,
       type,
       category,
-      startDate:startDate,
-      endDate:endDate,
+      startDate: startDate ? formatDate(startDate) : '',
+      endDate: endDate ? formatDate(endDate) : '',
       offset: reset ? 0 : offset,
       limit,
     });
@@ -159,7 +161,7 @@ const Home = () => {
 
               <p className="text-gray-700 mb-2">
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
-                {event.startDate}  "to" {event.endDate}
+                {formatDate(event.start_date)} to {formatDate(event.end_date)}
               </p>
               <p className="text-gray-700 mb-4">
                 <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
