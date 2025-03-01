@@ -18,28 +18,20 @@ const Home = () => {
 
   const limit = 6;
 
-  // Format date as string in "DD-MM-YYYY" format
-  const formatDateString = (date) => {
-    if (!date) return '';
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+  
 
   const fetchEvents = async (reset = false) => {
     setLoading(true);
 
-    const formattedStartDate = formatDateString(startDate);
-    const formattedEndDate = formatDateString(endDate);
+   
 
     const params = new URLSearchParams({
       keywords,
       location,
       type,
       category,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
+      startDate:startDate,
+      endDate:endDate,
       offset: reset ? 0 : offset,
       limit,
     });
