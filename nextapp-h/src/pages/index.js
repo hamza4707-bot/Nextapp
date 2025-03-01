@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faLocationArrow, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 const Home = () => {
@@ -64,7 +64,7 @@ const Home = () => {
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Find Events</h1>
 
-      {/* 🔍 Search Filters */}
+      {/* Search Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <input
           type="text"
@@ -82,7 +82,7 @@ const Home = () => {
           className="border p-2 rounded-md"
         />
 
-        {/* 📅 Start Date Picker */}
+        {/* Start Date Picker */}
         <div className="relative">
           <DatePicker
             selected={startDate}
@@ -96,7 +96,7 @@ const Home = () => {
           />
         </div>
 
-        {/* 📅 End Date Picker */}
+        {/* End Date Picker */}
         <div className="relative">
           <DatePicker
             selected={endDate}
@@ -123,7 +123,7 @@ const Home = () => {
         </select>
       </div>
 
-      {/* 🔍 Search & Reset Buttons */}
+      {/* Search & Reset Buttons */}
       <div className="flex gap-4">
         <button 
           onClick={() => fetchEvents(true)}
@@ -140,7 +140,7 @@ const Home = () => {
         </button>
       </div>
 
-      {/* 📌 Enhanced Events List */}
+      {/* Events List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {events.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -150,12 +150,6 @@ const Home = () => {
               )}
 
               <h5 className="capitalize text-black text-2xl font-semibold mb-2">{event.title}</h5>
-
-              {event.tag && (
-                <span className="inline-block bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                  {event.tag}
-                </span>
-              )}
 
               <p className="text-gray-700 mb-4">{event.description}</p>
 
@@ -177,17 +171,6 @@ const Home = () => {
           </div>
         ))}
       </div>
-
-      {/* Load More Button */}
-      {events.length >= limit && (
-        <button
-          onClick={() => fetchEvents(false)}
-          className="bg-gray-500 text-white px-4 py-2 rounded-md mt-6"
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Load More"}
-        </button>
-      )}
     </div>
   );
 };
