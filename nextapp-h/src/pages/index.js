@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faLocationArrow, faTimes } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
 const Home = () => {
@@ -50,6 +50,16 @@ const Home = () => {
     fetchEvents(true);
   }, []);
 
+  const resetFilters = () => {
+    setStartDate(null);
+    setEndDate(null);
+    setKeywords('');
+    setLocation('');
+    setType('');
+    setCategory('');
+    fetchEvents(true);
+  };
+
   return (
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Find Events</h1>
@@ -73,20 +83,41 @@ const Home = () => {
         />
 
         {/* 📅 Date Pickers */}
-        <DatePicker
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-          className="border p-2 rounded-md"
-          placeholderText="Start Date"
-          dateFormat="yyyy-MM-dd"
-        />
-        <DatePicker
-          selected={endDate}
-          onChange={(date) => setEndDate(date)}
-          className="border p-2 rounded-md"
-          placeholderText="End Date"
-          dateFormat="yyyy-MM-dd"
-        />
+        <div className="relative">
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            className="border p-2 rounded-md w-full"
+            placeholderText="Start Date"
+            dateFormat="yyyy-MM-dd"
+          />
+          {startDate && (
+            <button
+              className="absolute right-3 top-3 text-gray-500"
+              onClick={() => setStartDate(null)}
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          )}
+        </div>
+
+        <div className="relative">
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            className="border p-2 rounded-md w-full"
+            placeholderText="End Date"
+            dateFormat="yyyy-MM-dd"
+          />
+          {endDate && (
+            <button
+              className="absolute right-3 top-3 text-gray-500"
+              onClick={() => setEndDate(null)}
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          )}
+        </div>
 
         <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md">
           <option value="">All Types</option>
@@ -103,13 +134,22 @@ const Home = () => {
         </select>
       </div>
 
-      {/* 🔍 Search Button */}
-      <button 
-        onClick={() => fetchEvents(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-      >
-        Search
-      </button>
+      {/* 🔍 Search & Reset Buttons */}
+      <div className="flex gap-4">
+        <button 
+          onClick={() => fetchEvents(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Search
+        </button>
+
+        <button 
+          onClick={resetFilters}
+          className="bg-gray-500 text-white px-4 py-2 rounded-md"
+        >
+          Reset
+        </button>
+      </div>
 
       {/* 📌 Enhanced Events List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
