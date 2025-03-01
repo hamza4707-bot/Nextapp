@@ -18,15 +18,6 @@ const Home = () => {
 
   const limit = 6;
 
-  // Function to format dates to yymmdd
-  const formatDate = (date) => {
-    if (!date) return '';
-    const year = date.getFullYear().toString().slice(2);
-    const month = (`0${date.getMonth() + 1}`).slice(-2);
-    const day = (`0${date.getDate()}`).slice(-2);
-    return `${year}${month}${day}`;
-  };
-
   const fetchEvents = async (reset = false) => {
     setLoading(true);
 
@@ -35,8 +26,8 @@ const Home = () => {
       location,
       type,
       category,
-      startDate: startDate ? formatDate(startDate) : '',
-      endDate: endDate ? formatDate(endDate) : '',
+      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
+      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       offset: reset ? 0 : offset,
       limit,
     });
@@ -164,7 +155,7 @@ const Home = () => {
 
               <p className="text-gray-700 mb-2">
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
-                {event.startDate} to {event.endDate}
+                {event.start_date} to {event.end_date}
               </p>
               <p className="text-gray-700 mb-4">
                 <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
