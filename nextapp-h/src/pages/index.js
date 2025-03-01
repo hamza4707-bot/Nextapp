@@ -18,16 +18,28 @@ const Home = () => {
 
   const limit = 6;
 
+  // Format date as string in "DD-MM-YYYY" format
+  const formatDateString = (date) => {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   const fetchEvents = async (reset = false) => {
     setLoading(true);
+
+    const formattedStartDate = formatDateString(startDate);
+    const formattedEndDate = formatDateString(endDate);
 
     const params = new URLSearchParams({
       keywords,
       location,
       type,
       category,
-      startDate: startDate ? startDate.toISOString().split('T')[0] : '',
-      endDate: endDate ? endDate.toISOString().split('T')[0] : '',
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
       offset: reset ? 0 : offset,
       limit,
     });
@@ -92,7 +104,7 @@ const Home = () => {
             }}
             className="border p-2 rounded-md w-full"
             placeholderText="Start Date"
-            dateFormat="yyyy-MM-dd"
+            dateFormat="dd-MM-yyyy"
           />
         </div>
 
@@ -103,7 +115,7 @@ const Home = () => {
             onChange={(date) => setEndDate(date)}
             className="border p-2 rounded-md w-full"
             placeholderText="End Date"
-            dateFormat="yyyy-MM-dd"
+            dateFormat="dd-MM-yyyy"
             minDate={startDate} // Prevent selecting an end date before start date
           />
         </div>
