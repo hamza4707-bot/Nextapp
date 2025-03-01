@@ -18,10 +18,13 @@ const Home = () => {
 
   const limit = 6;
 
+  // Function to format dates to yymmdd
   const formatDate = (date) => {
     if (!date) return '';
-    const d = new Date(date);
-    return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+    const year = date.getFullYear().toString().slice(2);
+    const month = (`0${date.getMonth() + 1}`).slice(-2);
+    const day = (`0${date.getDate()}`).slice(-2);
+    return `${year}${month}${day}`;
   };
 
   const fetchEvents = async (reset = false) => {
@@ -161,7 +164,7 @@ const Home = () => {
 
               <p className="text-gray-700 mb-2">
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
-                {formatDate(event.start_date)} to {formatDate(event.end_date)}
+                {event.startDate} to {event.endDate}
               </p>
               <p className="text-gray-700 mb-4">
                 <FontAwesomeIcon icon={faLocationArrow} className="mr-2" />
