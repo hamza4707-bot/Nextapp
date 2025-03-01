@@ -10,7 +10,10 @@ export default async function handler(req, res) {
   let query = supabase.from('events').select('*');
 
   if (startDate && endDate) {
-    query = query.gte('date', startDate).lte('date', endDate);
+    // Match the stored date range with selected start & end dates
+    query = query.or(`
+      date.ilike.%${startDate} - ${endDate}%
+    `);
   }
 
   if (keywords) {
