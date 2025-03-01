@@ -11,13 +11,10 @@ export default async function handler(req, res) {
 
   // Date handling: Match start and end date range
   if (startDate && endDate) {
-    const formattedStartDate = new Date(startDate.split('-').reverse().join('-')).toISOString().split('T')[0];
-    const formattedEndDate = new Date(endDate.split('-').reverse().join('-')).toISOString().split('T')[0];
-
     // Query to match the start_date and end_date separately
     query = query.or(`
-      (start_date >= '${formattedStartDate}' AND end_date <= '${formattedEndDate}'),
-      (start_date <= '${formattedEndDate}' AND end_date >= '${formattedStartDate}')
+      (start_date >= '${startDate}' AND end_date <= '${endDate}'),
+      (start_date <= '${endDate}' AND end_date >= '${startDate}')
     `);
   }
 
