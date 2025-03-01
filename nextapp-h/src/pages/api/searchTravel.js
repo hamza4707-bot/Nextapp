@@ -9,11 +9,16 @@ export default async function handler(req, res) {
 
   let query = supabase.from('events').select('*');
 
+  // Date handling: Match date range string in the format 'DD-MM-YYYY to DD-MM-YYYY'
   if (startDate && endDate) {
+    // Format for comparison: '01-01-2024 to 01-05-2024'
+    const startDateRange = `${startDate} to ${endDate}`;
+
+    // Query to match the date range as a string in the database
     query = query.or(`
-      date.ilike.%${startDate} - ${endDate}%,
-      date.ilike.%${startDate} -%,
-      date.ilike.% - ${endDate}%
+      date.ilike.%${startDateRange}%, 
+      date.ilike.%${startDate}%, 
+      date.ilike.%${endDate}%
     `);
   }
 
