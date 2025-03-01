@@ -61,6 +61,13 @@ const Home = () => {
     fetchEvents(true);
   };
 
+  // Log date format whenever startDate or endDate is updated
+  const logDateFormat = (date, label) => {
+    if (date) {
+      console.log(`${label} selected date: ${date.toISOString().split('T')[0]}`);
+    }
+  };
+
   return (
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Find Events</h1>
@@ -89,6 +96,7 @@ const Home = () => {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
+              logDateFormat(date, 'Start Date'); // Log the start date format
               if (endDate && date > endDate) setEndDate(null); // Ensure valid range
             }}
             className="border p-2 rounded-md w-full"
@@ -101,7 +109,10 @@ const Home = () => {
         <div className="relative">
           <DatePicker
             selected={endDate}
-            onChange={(date) => setEndDate(date)}
+            onChange={(date) => {
+              setEndDate(date);
+              logDateFormat(date, 'End Date'); // Log the end date format
+            }}
             className="border p-2 rounded-md w-full"
             placeholderText="End Date"
             dateFormat="dd-MM-yyyy" // Keep this format for UI
