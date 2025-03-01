@@ -82,25 +82,21 @@ const Home = () => {
           className="border p-2 rounded-md"
         />
 
-        {/* 📅 Date Pickers */}
+        {/* 📅 Start Date Picker */}
         <div className="relative">
           <DatePicker
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={(date) => {
+              setStartDate(date);
+              if (endDate && date > endDate) setEndDate(null); // Ensure valid range
+            }}
             className="border p-2 rounded-md w-full"
             placeholderText="Start Date"
             dateFormat="yyyy-MM-dd"
           />
-          {startDate && (
-            <button
-              className="absolute right-3 top-3 text-gray-500"
-              onClick={() => setStartDate(null)}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          )}
         </div>
 
+        {/* 📅 End Date Picker */}
         <div className="relative">
           <DatePicker
             selected={endDate}
@@ -108,15 +104,8 @@ const Home = () => {
             className="border p-2 rounded-md w-full"
             placeholderText="End Date"
             dateFormat="yyyy-MM-dd"
+            minDate={startDate} // Prevent selecting an end date before start date
           />
-          {endDate && (
-            <button
-              className="absolute right-3 top-3 text-gray-500"
-              onClick={() => setEndDate(null)}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
-          )}
         </div>
 
         <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md">
