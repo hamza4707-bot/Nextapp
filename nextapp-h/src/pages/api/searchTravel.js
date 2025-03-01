@@ -9,19 +9,20 @@ export default async function handler(req, res) {
 
   let query = supabase.from('events').select('*');
 
-  // Date handling: Match date range string in the format 'DD-MM-YYYY to DD-MM-YYYY'
+  // Date handling: Match start and end date range
   if (startDate && endDate) {
-    // Format for comparison: '01-01-2024 to 01-05-2024'
-    const startDateRange = `${startDate} to ${endDate}`;
+    // Convert string dates into format for SQL comparison
+    const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
+    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
 
-    // Query to match the date range as a string in the database
+    // Query to match the start_date and end_date separately
     query = query.or(`
-      date.ilike.%${startDateRange}%, 
-      date.ilike.%${startDate}%, 
-      date.ilike.%${endDate}%
+      (start_date >= '${formattedStartDate}' AND end_date <= '${formattedEndDate}'),
+      (start_date <= '${formattedEndDate}' AND end_date >= '${formattedStartDate}')
     `);
   }
 
+  // Handle other filters like keywords, location, type, category
   if (keywords) {
     query = query.or(`title.ilike.%${keywords}%, description.ilike.%${keywords}%`);
   }
