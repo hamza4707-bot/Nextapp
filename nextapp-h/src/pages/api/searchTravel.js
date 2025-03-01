@@ -11,9 +11,8 @@ export default async function handler(req, res) {
 
   // Date handling: Match start and end date range
   if (startDate && endDate) {
-    // Convert string dates into format for SQL comparison
-    const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
-    const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+    const formattedStartDate = new Date(startDate.split('-').reverse().join('-')).toISOString().split('T')[0];
+    const formattedEndDate = new Date(endDate.split('-').reverse().join('-')).toISOString().split('T')[0];
 
     // Query to match the start_date and end_date separately
     query = query.or(`
