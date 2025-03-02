@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 
+import Menu from "../components/Menu"; 
+import Footer from "../components/Footer";
+
 const Home = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -75,7 +78,8 @@ const resetFilters = () => {
   }, 500); // Small delay ensures state updates before fetching
 };
   return (
-
+<>
+<Menu />
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-black">Find Events</h1>
 
@@ -243,7 +247,9 @@ Group Galivanting
           <span>Loading...</span>
         </div>
       )}
+<Footer />
     </div>
+</>
   );
 };
 
