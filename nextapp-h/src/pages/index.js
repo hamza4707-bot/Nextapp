@@ -78,8 +78,8 @@ const Home = () => {
   };
 
   return (
-    <div>
-      <Header />
+    <>
+      
       <Menu />
 
       <div className="container mx-auto mt-10 px-4">
@@ -238,7 +238,7 @@ const Home = () => {
       </div>
 
       <Footer />
-    </div>
+    </>
   );
 };
 
