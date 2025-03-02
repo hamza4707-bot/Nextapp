@@ -4,7 +4,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import Header from "../components/Header";
 import Menu from "../components/Menu";
 import Footer from "../components/Footer";
 
