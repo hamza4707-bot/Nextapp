@@ -1,19 +1,20 @@
 import { useRouter } from "next/router";
 import { FaFacebook } from "react-icons/fa"; // Import Facebook icon
 import { useEffect, useState } from "react";
+import { supabase } from '../../lib/supabase'; // Import supabase client
 
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
-  // Fetch all events from your API
-  const res = await fetch(`https://triptest1.netlify.app/api/searchTravel`);
-  const events = await res.json();
+  // Query Supabase for the event by ID
+  const { data: event, error } = await supabase
+    .from('events')  // Replace with your actual table name
+    .select('*')
+    .eq('id', id)
+    .single();  // Fetch a single event
 
-  // Find the specific event by ID
-  const event = events.find((event) => event.id === id);
-
-  // If no event is found, return a 404 page
-  if (!event) {
+  // Handle errors or if no event is found
+  if (error || !event) {
     return { notFound: true };
   }
 
@@ -45,8 +46,8 @@ const EventPage = ({ event }) => {
 
       {/* Date and Location */}
       <h2 className="text-xl text-black font-semibold mt-4">
-  📅 Date: {new Date(event.start_date).toLocaleDateString()} to {new Date(event.end_date).toLocaleDateString()}
-</h2>
+        📅 Date: {new Date(event.start_date).toLocaleDateString()} to {new Date(event.end_date).toLocaleDateString()}
+      </h2>
 
       <h2 className="text-xl text-black font-semibold mt-2">📍 Location: {event.location}</h2>
 
