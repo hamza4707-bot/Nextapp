@@ -23,6 +23,7 @@ export async function getServerSideProps({ params }) {
 const EventPage = ({ event }) => {
   const router = useRouter();
   const [currentUrl, setCurrentUrl] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false); // State to control expand/collapse
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -45,6 +46,29 @@ const EventPage = ({ event }) => {
       {/* Date and Location */}
       <h2 className="text-xl text-black font-semibold mt-4">📅 Date: {event.date}</h2>
       <h2 className="text-xl text-black font-semibold mt-2">📍 Location: {event.location}</h2>
+
+      {/* Expand/Collapse Button */}
+      <button 
+        onClick={() => setIsExpanded(!isExpanded)} 
+        className="mt-4 px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300"
+      >
+        {isExpanded ? "Show Less" : "More Event Info"}
+      </button>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="mt-4">
+          <h3 className="text-xl font-semibold">Click the link for more content:</h3>
+          <a 
+            href={event.el} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-blue-600 hover:underline"
+          >
+            {event.el}
+          </a>
+        </div>
+      )}
 
       {/* Facebook Share Button */}
       <button 
