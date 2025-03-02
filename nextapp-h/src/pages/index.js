@@ -58,21 +58,24 @@ const Home = () => {
 
   
 const resetFilters = () => {
+  setLoading(true); // Show loader while resetting
+
   setStartDate(null);
   setEndDate(null);
   setKeywords('');
   setLocation('');
   setType('');
   setCategory('');
-  setEvents([]);
+  setEvents([]);  // Clear the event list
   setOffset(0);
   setHasMore(true);
 
   setTimeout(() => {
     fetchEvents(true);
-  }, 10); // Small delay ensures state updates before fetching
+  }, 500); // Small delay ensures state updates before fetching
 };
   return (
+
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-black">Find Events</h1>
 
@@ -186,6 +189,12 @@ Group Galivanting
 
       {/* Events List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+{/* Loading Spinner */}
+{loading && (
+  <div className="flex justify-center mt-4">
+    <span>Loading...</span>
+  </div>
+)}
         {events.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="p-6">
