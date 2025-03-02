@@ -44,7 +44,10 @@ const EventPage = ({ event }) => {
       <div className="mt-4 text-gray-800">{event.content}</div>
 
       {/* Date and Location */}
-      <h2 className="text-xl text-black font-semibold mt-4">📅 Date: {event.start_date} to {event.end_date}</h2>
+      <h2 className="text-xl text-black font-semibold mt-4">
+  📅 Date: {new Date(event.start_date).toLocaleDateString()} to {new Date(event.end_date).toLocaleDateString()}
+</h2>
+
       <h2 className="text-xl text-black font-semibold mt-2">📍 Location: {event.location}</h2>
 
       {/* Expand/Collapse Button */}
