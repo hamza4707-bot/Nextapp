@@ -15,15 +15,10 @@ if (startDate && endDate) {
      end_date.gte.${startDate}, end_date.lte.${endDate}, 
      start_date.lte.${startDate}, end_date.gte.${endDate}`
   );
+} 
+if (keywords.trim() !== '') {
+  query = query.ilike('title', `%${keywords.trim()}%`);
 }
-
-  // Handle other filters like keywords, location, type, category
-  // Handle keywords filter for title only
-if (keywords) {
-  query = query.ilike('title', `%${keywords}%`);
-}
-
-
 
   if (location) {
     query = query.ilike('location', `%${location}%`);
