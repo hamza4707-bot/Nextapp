@@ -9,17 +9,13 @@ export default async function handler(req, res) {
 
   let query = supabase.from('events').select('*');
 if (startDate && endDate) {
-  // Search within the date range
-  query = query.or(`
-    (start_date.gte.${startDate} AND start_date.lte.${endDate}),
-    (end_date.gte.${startDate} AND end_date.lte.${endDate}),
-    (start_date.lte.${startDate} AND end_date.gte.${endDate})
-  `);
+  query = query
+    .or(`start_date.gte.${startDate},end_date.gte.${startDate}`)
+    .or(`start_date.lte.${endDate},end_date.lte.${endDate}`)
+    .or(`start_date.lte.${startDate},end_date.gte.${endDate}`);
 } else if (startDate) {
-  // Search where event starts from or after startDate
   query = query.gte("start_date", startDate);
 } else if (endDate) {
-  // Search where event ends on or before endDate
   query = query.lte("end_date", endDate);
 }
 if (keywords.trim() !== '') {
