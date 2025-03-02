@@ -56,15 +56,18 @@ const Home = () => {
     fetchEvents(true);
   }, []);
 
-  const resetFilters = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setKeywords('');
-    setLocation('');
-    setType('');
-    setCategory('');
-    fetchEvents(true);
-  };
+  
+const resetFilters = () => {
+  setStartDate(null);
+  setEndDate(null);
+  setKeywords('');
+  setLocation('');
+  setType('');
+  setCategory('');
+  setHasMore(true); // Reset to true so Load More button shows again
+  setOffset(0); // Reset offset to start fetching from the beginning
+  fetchEvents(true);
+};
 
   return (
     <div className="container mx-auto mt-10 px-4">
