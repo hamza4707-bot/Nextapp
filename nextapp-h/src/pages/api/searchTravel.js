@@ -8,14 +8,13 @@ export default async function handler(req, res) {
   const { startDate, endDate, keywords, location, type, category, limit = 6, offset = 0 } = req.query;
 
   let query = supabase.from('events').select('*');
-
-  // Use startDate and endDate directly without modification since the db stores them in 'yyyy-MM-dd' format
+//date,
 if (startDate && endDate) {
-  query = query.or(`
-    (start_date >= '${startDate}' AND start_date <= '${endDate}'),
-    (end_date >= '${startDate}' AND end_date <= '${endDate}'),
-    (start_date <= '${startDate}' AND end_date >= '${endDate}')
-  `);
+  query = query.or(
+    `start_date.gte.${startDate}, start_date.lte.${endDate}, 
+     end_date.gte.${startDate}, end_date.lte.${endDate}, 
+     start_date.lte.${startDate}, end_date.gte.${endDate}`
+  );
 }
 
   // Handle other filters like keywords, location, type, category
