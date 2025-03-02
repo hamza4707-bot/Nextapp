@@ -9,20 +9,22 @@ export default async function handler(req, res) {
 
   let query = supabase.from('events').select('*');
 
-  // If startDate is provided, filter by start_date
-  if (startDate) {
-    query = query.gte('start_date', startDate); // Fetch events that start from the given startDate
-  }
-
-  // If endDate is provided, filter by end_date
-  if (endDate) {
-    query = query.lte('end_date', endDate); // Fetch events that end before the given endDate
-  }
+  // Use startDate and endDate directly without modification since the db stores them in 'yyyy-MM-dd' format
+if (startDate && endDate) {
+  query = query.or(`
+    (start_date >= '${startDate}' AND start_date <= '${endDate}'),
+    (end_date >= '${startDate}' AND end_date <= '${endDate}'),
+    (start_date <= '${startDate}' AND end_date >= '${endDate}')
+  `);
+}
 
   // Handle other filters like keywords, location, type, category
-  if (keywords) {
-    query = query.or(`title.ilike.%${keywords}%, description.ilike.%${keywords}%`);
-  }
+  // Handle keywords filter for title only
+if (keywords) {
+  query = query.ilike('title', `%${keywords}%`);
+}
+
+
 
   if (location) {
     query = query.ilike('location', `%${location}%`);
