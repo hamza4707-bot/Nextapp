@@ -122,17 +122,45 @@ const resetFilters = () => {
         {/* Type Filter */}
         <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md text-black">
           <option value="">All Types</option>
-          <option value="festival">Festival</option>
-          <option value="concert">Concert</option>
-          <option value="sports">Sports</option>
+        
+  <option value="amusement">Amusement Parks</option>
+  <option value="animals">Animals & Aquariums</option>
+  <option value="beaches">Beaches</option>
+  <option value="caves">Caves</option>
+  <option value="chair">Chair Champs</option>
+  <option value="fair">Fairs & Festivals</option>
+  <option value="food">Food Halls / Court</option>
+  <option value="free">Free is for Me!</option>
+  <option value="girls">Girls at Night</option>
+  <option value="hikes">Hikes</option>
+  <option value="lakes">Lakes</option>
+  <option value="move">Move Your Body</option>
+  <option value="museums">Museums</option>
+  <option value="art">Museums – Art</option>
+  <option value="nature">Nature Centers</option>
+  <option value="parks">Parks with Perks</option>
+  <option value="race">Race & Endurance Events</option>
+  <option value="rainy">Rainy Day (Indoor activities)</option>
+  <option value="rentals">Rentals</option>
+  <option value="scavenger">Scavenger Hunts</option>
+  <option value="splash">Splash Pads</option>
+  <option value="tours">Tours</option>
+  <option value="unique">Unique Food Experiences</option>
+  <option value="volunteering">Volunteering (with no obligation)</option>
+  <option value="wild">Wild & Wacky</option>
+  <option value="zen">Zen Out</option>
+
         </select>
 
         {/* Category Filter */}
         <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded-md text-black">
           <option value="">All Categories</option>
-          <option value="music">Music</option>
-          <option value="art">Art</option>
-          <option value="outdoor">Outdoor</option>
+       <option value="date">Date Night</option>
+   <option value="family">Family Fun</option>
+          <option value="solo">Flying solo</option>
+<option value="group">
+Group Galivanting
+</option>
         </select>
       </div>
 
