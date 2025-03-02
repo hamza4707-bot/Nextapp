@@ -68,7 +68,7 @@ const Home = () => {
 
   return (
     <div className="container mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Find Events</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-black">Find Events</h1>
 
       {/* Search Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -78,7 +78,7 @@ const Home = () => {
           value={keywords}
           onChange={(e) => setKeywords(e.target.value)}
           placeholder="Search events..."
-          className="border p-2 rounded-md"
+          className="border p-2 rounded-md text-black"
         />
 
         {/* Location Filter */}
@@ -87,7 +87,7 @@ const Home = () => {
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location..."
-          className="border p-2 rounded-md"
+          className="border p-2 rounded-md text-black"
         />
 
         {/* Start Date Picker */}
@@ -98,18 +98,18 @@ const Home = () => {
               setStartDate(date);
               if (endDate && date > endDate) setEndDate(null); // Ensure valid range
             }}
-            className="border p-2 rounded-md w-full"
+            className="border p-2 rounded-md w-full text-black"
             placeholderText="Start Date"
             dateFormat="yyyy-MM-dd" // Format as 'YYYY-MM-DD'
           />
         </div>
 
         {/* End Date Picker */}
-        <div className="relative">
+        <div className="relative text-black">
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
-            className="border p-2 rounded-md w-full"
+            className="border p-2 rounded-md w-full text-black"
             placeholderText="End Date"
             dateFormat="yyyy-MM-dd" // Format as 'YYYY-MM-DD'
             minDate={startDate} // Prevent selecting an end date before start date
@@ -117,7 +117,7 @@ const Home = () => {
         </div>
 
         {/* Type Filter */}
-        <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md">
+        <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md text-black">
           <option value="">All Types</option>
           <option value="festival">Festival</option>
           <option value="concert">Concert</option>
@@ -125,7 +125,7 @@ const Home = () => {
         </select>
 
         {/* Category Filter */}
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded-md">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded-md text-black">
           <option value="">All Categories</option>
           <option value="music">Music</option>
           <option value="art">Art</option>
