@@ -41,13 +41,7 @@ const Home = () => {
     const response = await fetch(`/api/searchTravel?${params}`);
     const data = await response.json();
 
-    if (reset) {
-      setEvents(data);
-      setOffset(limit);
-    } else {
-      setEvents((prev) => [...prev, ...data]);
-      setOffset((prev) => prev + limit);
-    }
+  
 
     setLoading(false);
     if (data.length < limit) {
@@ -61,21 +55,7 @@ const Home = () => {
 
   
 const resetFilters = () => {
-  setLoading(true); // Show loader while resetting
-
-  setStartDate(null);
-  setEndDate(null);
-  setKeywords('');
-  setLocation('');
-  setType('');
-  setCategory('');
-  setEvents([]);  // Clear the event list
-  setOffset(0);
-  setHasMore(true);
-
-  setTimeout(() => {
-    fetchEvents(true);
-  }, 500); // Small delay ensures state updates before fetching
+  window.location.reload();
 };
   return (
 <>
@@ -193,12 +173,7 @@ Group Galivanting
 
       {/* Events List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-{/* Loading Spinner */}
-{loading && (
-  <div className="flex justify-center mt-4">
-    <span>Loading...</span>
-  </div>
-)}
+
         {events.map((event) => (
           <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="p-6">
