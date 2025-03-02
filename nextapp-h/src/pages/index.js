@@ -161,7 +161,7 @@ const Home = () => {
 
               <h5 className="capitalize text-black text-2xl font-semibold mb-2">{event.title}</h5>
 
-              <p className="text-gray-700 mb-4">{event.description}</p>
+           
 
               <p className="text-gray-700 mb-2">
                 <FontAwesomeIcon icon={faClock} className="mr-2" />
