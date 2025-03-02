@@ -17,7 +17,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);  // To check if there are more events
 
-  const limit = 6;
+  const limit = 2;
 
   // Fetch events from the API
   const fetchEvents = async (reset = false) => {
@@ -64,11 +64,14 @@ const resetFilters = () => {
   setLocation('');
   setType('');
   setCategory('');
-  setHasMore(true); // Reset to true so Load More button shows again
-  setOffset(0); // Reset offset to start fetching from the beginning
-  fetchEvents(true);
-};
+  setEvents([]);
+  setOffset(0);
+  setHasMore(true);
 
+  setTimeout(() => {
+    fetchEvents(true);
+  }, 10); // Small delay ensures state updates before fetching
+};
   return (
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-black">Find Events</h1>
