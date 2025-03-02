@@ -15,9 +15,11 @@ const Home = () => {
   const [events, setEvents] = useState([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);  // To check if there are more events
 
   const limit = 6;
 
+  // Fetch events from the API
   const fetchEvents = async (reset = false) => {
     setLoading(true);
 
@@ -26,7 +28,7 @@ const Home = () => {
       location,
       type,
       category,
-      // Ensure startDate and endDate are formatted in 'YYYY-MM-DD' format for the API
+      // Format startDate and endDate as 'YYYY-MM-DD' for the API
       startDate: startDate ? startDate.toISOString().split('T')[0] : '',
       endDate: endDate ? endDate.toISOString().split('T')[0] : '',
       offset: reset ? 0 : offset,
@@ -45,6 +47,9 @@ const Home = () => {
     }
 
     setLoading(false);
+    if (data.length < limit) {
+      setHasMore(false);  // No more events to load
+    }
   };
 
   useEffect(() => {
@@ -61,19 +66,13 @@ const Home = () => {
     fetchEvents(true);
   };
 
-  // Log date format whenever startDate or endDate is updated
-  const logDateFormat = (date, label) => {
-    if (date) {
-      console.log(`${label} selected date: ${date.toISOString().split('T')[0]}`);
-    }
-  };
-
   return (
     <div className="container mx-auto mt-10 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Find Events</h1>
 
       {/* Search Filters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        {/* Keywords Filter */}
         <input
           type="text"
           value={keywords}
@@ -82,6 +81,7 @@ const Home = () => {
           className="border p-2 rounded-md"
         />
 
+        {/* Location Filter */}
         <input
           type="text"
           value={location}
@@ -96,12 +96,11 @@ const Home = () => {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              logDateFormat(date, 'Start Date'); // Log the start date format
               if (endDate && date > endDate) setEndDate(null); // Ensure valid range
             }}
             className="border p-2 rounded-md w-full"
             placeholderText="Start Date"
-            dateFormat="dd-MM-yyyy" // Keep this format for UI
+            dateFormat="yyyy-MM-dd" // Format as 'YYYY-MM-DD'
           />
         </div>
 
@@ -109,17 +108,15 @@ const Home = () => {
         <div className="relative">
           <DatePicker
             selected={endDate}
-            onChange={(date) => {
-              setEndDate(date);
-              logDateFormat(date, 'End Date'); // Log the end date format
-            }}
+            onChange={(date) => setEndDate(date)}
             className="border p-2 rounded-md w-full"
             placeholderText="End Date"
-            dateFormat="dd-MM-yyyy" // Keep this format for UI
+            dateFormat="yyyy-MM-dd" // Format as 'YYYY-MM-DD'
             minDate={startDate} // Prevent selecting an end date before start date
           />
         </div>
 
+        {/* Type Filter */}
         <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded-md">
           <option value="">All Types</option>
           <option value="festival">Festival</option>
@@ -127,6 +124,7 @@ const Home = () => {
           <option value="sports">Sports</option>
         </select>
 
+        {/* Category Filter */}
         <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded-md">
           <option value="">All Categories</option>
           <option value="music">Music</option>
@@ -183,6 +181,25 @@ const Home = () => {
           </div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {hasMore && !loading && (
+        <div className="flex justify-center mt-4">
+          <button 
+            onClick={() => fetchEvents(false)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Load More
+          </button>
+        </div>
+      )}
+
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="flex justify-center mt-4">
+          <span>Loading...</span>
+        </div>
+      )}
     </div>
   );
 };
