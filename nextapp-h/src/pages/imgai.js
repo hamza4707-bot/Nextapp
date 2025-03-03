@@ -1,4 +1,3 @@
-// pages/imgsi.js
 import { useState } from "react";
 
 export default function Imgsi() {
@@ -23,10 +22,10 @@ export default function Imgsi() {
       });
 
       const data = await response.json();
-      if (data.imageUrl) {
+      if (response.ok && data.imageUrl) {
         setImageUrl(data.imageUrl);
       } else {
-        setError("Failed to generate image");
+        setError(data.error || "Failed to generate image");
       }
     } catch (err) {
       setError("Error generating image");
@@ -38,7 +37,7 @@ export default function Imgsi() {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
       <h1 className="text-3xl font-bold mb-6">AI Image Generator</h1>
-      
+
       <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
         <label className="block mb-2 text-sm font-semibold">Prompt:</label>
         <input
