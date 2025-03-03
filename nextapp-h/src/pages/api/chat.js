@@ -16,8 +16,10 @@ export default async function handler(req, res) {
       messages: [{ role: "user", content: message }],
     });
 
-    res.status(200).json({ reply: response.data.choices[0].message.content });
+    const reply = response.data?.choices?.[0]?.message?.content || "No response from AI.";
+    res.status(200).json({ reply });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch response" });
+    console.error("AI API Error:", error);
+    res.status(500).json({ error: "Failed to fetch AI response" });
   }
 }
