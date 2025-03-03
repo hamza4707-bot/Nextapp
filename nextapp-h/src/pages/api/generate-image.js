@@ -1,11 +1,14 @@
-// pages/api/generate-image.js
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   const { prompt, steps, guidanceScale, width, height } = req.body;
-  const apiKey ="sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl"; // Store in .env.local
+  const apiKey = sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl; // Use environment variable
+
+  if (!apiKey) {
+    return res.status(500).json({ error: "API key is missing. Set it in .env.local" });
+  }
 
   try {
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
@@ -24,12 +27,14 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to generate image");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to generate image");
     }
 
     const data = await response.json();
-    res.status(200).json({ imageUrl: data.image });
+    res.status(200).json({ imageUrl: data.image_url }); // Ensure correct API response field
   } catch (error) {
+    console.error("API Error:", error.message);
     res.status(500).json({ error: error.message });
   }
 }
