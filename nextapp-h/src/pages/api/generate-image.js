@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   const { prompt, steps, guidanceScale, width, height } = req.body;
-  const apiKey = sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl; // Use environment variable
+  const apiKey =' sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl'; // Use environment variable
 
   if (!apiKey) {
     return res.status(500).json({ error: "API key is missing. Set it in .env.local" });
