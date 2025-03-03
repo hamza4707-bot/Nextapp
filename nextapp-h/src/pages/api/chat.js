@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       },
       {
         headers: {
-          Authorization: `Bearer YOUR_API_KEY`, // Replace with your API key
+          Authorization: `Bearer tgp_v1_RsA3WkYGAIInYlTS_OmZorHPQ-HXNzu7j_PBeZTqLl0`, // Replace with your API key
           "Content-Type": "application/json",
         },
       }
