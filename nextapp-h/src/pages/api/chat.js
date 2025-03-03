@@ -11,15 +11,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await axios.post("https://api.together.xyz/v1/chat/completions", {
-      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-      messages: [{ role: "user", content: message }],
-    }, {
-      headers: {
-        "Authorization": `Bearer YOUR_API_KEY`,
-        "Content-Type": "application/json",
+    const response = await axios.post(
+      "https://api.together.xyz/v1/chat/completions",
+      {
+        model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+        messages: [{ role: "user", content: message }],
+      },
+      {
+        headers: {
+          Authorization: `Bearer YOUR_API_KEY`, // Replace with your API key
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
 
     const reply = response.data?.choices?.[0]?.message?.content || "No response from AI.";
 
