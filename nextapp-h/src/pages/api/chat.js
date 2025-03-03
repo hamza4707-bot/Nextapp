@@ -11,24 +11,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await axios.post(
-      "https://api.together.xyz/v1/chat/completions",
-      {
-        model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-        messages: [{ role: "user", content: message }],
-      },
-      {
-        headers: {
-          "Authorization": `Bearer tgp_v1_RsA3WkYGAIInYlTS_OmZorHPQ-HXNzu7j_PBeZTqLl0`, // Replace with your key
-          "Content-Type": "application/json",
-        },
+    const response = await axios.post("https://api.together.xyz/v1/chat/completions", {
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+      messages: [{ role: "user", content: message }],
+    }, {
+      headers: {
+        "Authorization": `Bearer YOUR_API_KEY`,
+        "Content-Type": "application/json",
       }
-    );
+    });
 
     const reply = response.data?.choices?.[0]?.message?.content || "No response from AI.";
-    res.status(200).json({ reply });
+
+    // Detect if response contains code (by checking if it starts and ends with triple backticks)
+    const isCode = reply.startsWith("```") && reply.endsWith("```");
+
+    res.status(200).json({ reply, isCode });
   } catch (error) {
-    console.error("AI API Error:", error.response?.data || error.message);
+    console.error("AI API Error:", error);
     res.status(500).json({ error: "Failed to fetch AI response" });
   }
 }
