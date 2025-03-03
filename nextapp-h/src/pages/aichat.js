@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export default function Chatbot() {
   const [input, setInput] = useState("");
@@ -40,39 +39,40 @@ export default function Chatbot() {
     }
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
+    });
+  };
+
   const renderMessageContent = (content, isCode) => {
     if (isCode) {
-      // Remove triple backticks from the code block
       const codeContent = content.replace(/```/g, "");
       return (
         <div className="relative my-2">
           <SyntaxHighlighter language="javascript" style={dracula}>
             {codeContent.trim()}
           </SyntaxHighlighter>
-          <CopyToClipboard text={codeContent.trim()}>
-            <button className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md text-sm hover:bg-gray-600">
-              Copy
-            </button>
-          </CopyToClipboard>
+          <button
+            onClick={() => copyToClipboard(codeContent.trim())}
+            className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md text-sm hover:bg-gray-600"
+          >
+            Copy
+          </button>
         </div>
       );
     } else {
-      // Regular text with inline code detection
       const inlineCodeRegex = /`([^`]+)`/g;
       const parts = content.split(inlineCodeRegex);
-      return parts.map((part, index) => {
-        if (index % 2 === 1) {
-          // Inline code
-          return (
-            <code key={index} className="bg-gray-700 text-white px-1 rounded-md">
-              {part}
-            </code>
-          );
-        } else {
-          // Regular text
-          return <span key={index}>{part}</span>;
-        }
-      });
+      return parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <code key={index} className="bg-gray-700 text-white px-1 rounded-md">
+            {part}
+          </code>
+        ) : (
+          <span key={index}>{part}</span>
+        )
+      );
     }
   };
 
