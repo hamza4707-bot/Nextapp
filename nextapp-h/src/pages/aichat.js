@@ -6,10 +6,10 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false); // Loader state
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = { role: "user", content: input };
-    setMessages([...messages, userMessage]); // Show user message
+    setMessages((prev) => [...prev, userMessage]); // Show user message
     setInput("");
     setLoading(true); // Show loader while waiting
 
@@ -34,7 +34,7 @@ export default function Chatbot() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-2xl bg-gray-800 shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-semibold text-white text-center">DeepSeek AI Chatbot</h2>
+        <h2 className="text-2xl font-semibold text-white text-center">AI Chatbot</h2>
         <div className="h-96 overflow-y-auto bg-gray-700 p-4 mt-4 rounded-md">
           {messages.map((msg, index) => (
             <div key={index} className={`p-3 my-2 rounded-lg max-w-xs ${msg.role === "user" ? "ml-auto bg-blue-500 text-white" : "mr-auto bg-gray-600 text-white"}`}>
