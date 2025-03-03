@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   }
 
   const { prompt, steps, guidanceScale, width, height } = req.body;
-  const apiKey = process.env.STABILITY_API_KEY; // Store in .env.local
+  const apiKey = sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl; // Store in .env.local
 
   try {
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
