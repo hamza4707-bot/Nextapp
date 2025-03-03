@@ -28,8 +28,7 @@
     "@fullcalendar/interaction": "^6.1.11",
     "framer-motion": "beta",
     "axios": "^1.4.0",
-    "react-syntax-highlighter": "^15.5.0",
-    "react-copy-to-clipboard": "^5.1.0"
+    "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
     "postcss": "^8",
