@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 export default function Chatbot() {
   const [input, setInput] = useState("");
@@ -6,10 +9,10 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = { role: "user", content: input };
-    setMessages([...messages, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
 
@@ -24,13 +27,52 @@ export default function Chatbot() {
       if (data.reply) {
         setMessages((prev) => [
           ...prev,
-          { role: "bot", content: data.reply, isCode: data.reply.startsWith("```") && data.reply.endsWith("```") }
+          { role: "bot", content: data.reply, isCode: data.isCode },
         ]);
       }
     } catch (error) {
-      setMessages((prev) => [...prev, { role: "bot", content: "Error: Failed to get AI response." }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", content: "Error: Failed to get AI response." },
+      ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const renderMessageContent = (content, isCode) => {
+    if (isCode) {
+      // Remove triple backticks from the code block
+      const codeContent = content.replace(/```/g, "");
+      return (
+        <div className="relative my-2">
+          <SyntaxHighlighter language="javascript" style={dracula}>
+            {codeContent.trim()}
+          </SyntaxHighlighter>
+          <CopyToClipboard text={codeContent.trim()}>
+            <button className="absolute top-2 right-2 bg-gray-700 text-white px-2 py-1 rounded-md text-sm hover:bg-gray-600">
+              Copy
+            </button>
+          </CopyToClipboard>
+        </div>
+      );
+    } else {
+      // Regular text with inline code detection
+      const inlineCodeRegex = /`([^`]+)`/g;
+      const parts = content.split(inlineCodeRegex);
+      return parts.map((part, index) => {
+        if (index % 2 === 1) {
+          // Inline code
+          return (
+            <code key={index} className="bg-gray-700 text-white px-1 rounded-md">
+              {part}
+            </code>
+          );
+        } else {
+          // Regular text
+          return <span key={index}>{part}</span>;
+        }
+      });
     }
   };
 
@@ -40,20 +82,15 @@ export default function Chatbot() {
         <h2 className="text-2xl font-semibold text-white text-center">AI Chatbot</h2>
         <div className="h-96 overflow-y-auto bg-gray-700 p-4 mt-4 rounded-md">
           {messages.map((msg, index) => (
-            <div key={index} className={`p-3 my-2 rounded-lg max-w-xs ${msg.role === "user" ? "ml-auto bg-blue-500 text-white" : "mr-auto bg-gray-600 text-white"}`}>
-              {msg.isCode ? (
-                <div className="relative bg-gray-900 text-green-300 p-4 rounded-lg font-mono">
-                  <button
-                    className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white text-xs px-2 py-1 rounded"
-                    onClick={() => navigator.clipboard.writeText(msg.content.replace(/```/g, ''))}
-                  >
-                    Copy
-                  </button>
-                  <pre>{msg.content.replace(/```/g, '')}</pre>
-                </div>
-              ) : (
-                msg.content
-              )}
+            <div
+              key={index}
+              className={`p-3 my-2 rounded-lg max-w-xs ${
+                msg.role === "user"
+                  ? "ml-auto bg-blue-500 text-white"
+                  : "mr-auto bg-gray-600 text-white"
+              }`}
+            >
+              {renderMessageContent(msg.content, msg.isCode)}
             </div>
           ))}
           {loading && <div className="text-gray-400 text-center mt-2">AI is typing...</div>}
@@ -66,7 +103,11 @@ export default function Chatbot() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
           />
-          <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-3 rounded-r-lg" disabled={loading}>
+          <button
+            onClick={sendMessage}
+            className="bg-blue-500 text-white px-4 py-3 rounded-r-lg"
+            disabled={loading}
+          >
             {loading ? "..." : "Send"}
           </button>
         </div>
