@@ -3,24 +3,31 @@ import { useState } from "react";
 export default function Chatbot() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false); // Loader state
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = { role: "user", content: input };
-    setMessages([...messages, userMessage]);
-
+    setMessages([...messages, userMessage]); // Show user message
     setInput("");
+    setLoading(true); // Show loader while waiting
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input }),
-    });
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
 
-    const data = await res.json();
-    if (data.reply) {
-      setMessages([...messages, userMessage, { role: "bot", content: data.reply }]);
+      const data = await res.json();
+      if (data.reply) {
+        setMessages((prev) => [...prev, { role: "bot", content: data.reply }]);
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, { role: "bot", content: "Error: Failed to get AI response." }]);
+    } finally {
+      setLoading(false); // Hide loader
     }
   };
 
@@ -34,6 +41,7 @@ export default function Chatbot() {
               {msg.content}
             </div>
           ))}
+          {loading && <div className="text-gray-400 text-center mt-2">AI is typing...</div>}
         </div>
         <div className="flex mt-4">
           <input
@@ -43,7 +51,9 @@ export default function Chatbot() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
           />
-          <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-3 rounded-r-lg">Send</button>
+          <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-3 rounded-r-lg" disabled={loading}>
+            {loading ? "..." : "Send"}
+          </button>
         </div>
       </div>
     </div>
