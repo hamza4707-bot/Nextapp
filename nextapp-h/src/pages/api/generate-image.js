@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey} `,
+        "Authorization": `Bearer ${apiKey}`, // Removed trailing space
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -31,7 +31,13 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    res.status(200).json({ imageUrl: data.image_url }); // Ensure correct API response field
+    if (data.artifacts && data.artifacts.length > 0) {
+      const base64Image = data.artifacts[0].base64;
+      const imageUrl = `data:image/png;base64,${base64Image}`; // Construct data URL
+      res.status(200).json({ imageUrl });
+    } else {
+      res.status(500).json({ error: "No image artifacts received from API" });
+    }
   } catch (error) {
     console.error("API Error:", error.message);
     res.status(500).json({ error: error.message });
