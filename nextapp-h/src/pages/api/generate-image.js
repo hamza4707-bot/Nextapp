@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   const { prompt, steps, guidanceScale, width, height } = req.body;
-  
+  const apiKey = process.env.STABILITY_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: "API key is missing. Set it in .env.local" });
   }
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer sk-ALSuXDNUbhmcWTjnKFf4BuOgPRmkKWCrfYOK7uqS62CXclRl`,
+        "Authorization": `Bearer process.env.STABILITY_API_KEY `,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
