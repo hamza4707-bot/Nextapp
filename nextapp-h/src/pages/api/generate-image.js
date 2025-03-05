@@ -10,19 +10,21 @@ export default async function handler(req, res) {
   }
 
   try {
+    const formData = new FormData();
+    formData.append("prompt", prompt);
+    formData.append("steps", steps.toString());
+    formData.append("guidance_scale", guidanceScale.toString());
+    formData.append("width", width.toString());
+    formData.append("height", height.toString());
+    formData.append("accept", "application/json");
+
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`, // Removed trailing space
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "application/json",
       },
-      body: JSON.stringify({
-        prompt,
-        steps: steps || 30,
-        width: width || 512,
-        height: height || 512,
-        guidance_scale: guidanceScale || 7.5,
-      }),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -33,7 +35,7 @@ export default async function handler(req, res) {
     const data = await response.json();
     if (data.artifacts && data.artifacts.length > 0) {
       const base64Image = data.artifacts[0].base64;
-      const imageUrl = `data:image/png;base64,${base64Image}`; // Construct data URL
+      const imageUrl = `data:image/png;base64,${base64Image}`;
       res.status(200).json({ imageUrl });
     } else {
       res.status(500).json({ error: "No image artifacts received from API" });
