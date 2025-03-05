@@ -22,8 +22,8 @@ export default function Imgsi() {
       });
 
       const data = await response.json();
-      if (response.ok && data.imageUrl) {
-        setImageUrl(data.imageUrl);
+      if (response.ok && data.image_url) {
+        setImageUrl(data.image_url);
       } else {
         setError(data.error || "Failed to generate image");
       }
