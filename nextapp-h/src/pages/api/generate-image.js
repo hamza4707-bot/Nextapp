@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://api.stability.ai/v2beta/stable-image/generate/core", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer process.env.STABILITY_API_KEY `,
+        "Authorization": `Bearer ${apiKey} `,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
