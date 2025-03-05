@@ -107,7 +107,7 @@ export default function Imgsi() {
       {imageUrl && (
         <div className="mt-6">
           <h2 className="text-xl font-semibold">Generated Image:</h2>
-          <img src={imageUrl} alt="Generated AI" className="mt-4 rounded shadow-lg max-w-full" />
+          <img src={image_url} alt="Generated AI" className="mt-4 rounded shadow-lg max-w-full" />
         </div>
       )}
     </div>
