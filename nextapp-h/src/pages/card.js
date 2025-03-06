@@ -1,4 +1,4 @@
-import HeroCard from "@/components/Card";
+import HeroCard from "@/components/card";
 
 export default function Home() {
   return <HeroCard />;
