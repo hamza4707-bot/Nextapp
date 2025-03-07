@@ -1,8 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/globals.css';
+import { NextUIProvider } from "@nextui-org/react";
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+const theme = {
+  className: "text-black",
+};
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    <NextUIProvider theme={theme}>
+      <Component {...pageProps} />
+    </NextUIProvider>
+  );
 }
-
-export default MyApp;
