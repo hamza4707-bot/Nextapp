@@ -3,39 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: green;
-  --foreground: #171717;
+  --background: #ffffff; /* Changed to white for a clean look */
+  --foreground: #171717; /* Dark text for readability */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background:green;
+    --background: #171717;
     --foreground: #ededed;
   }
 }
 
 body {
   color: var(--foreground);
-  background:#f3f3f3;
+  background: var(--background); /* Use the variable for consistency */
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .bg-blue-c {
-    --tw-bg-opacity: 1;
-    background-color: rgb(44 48 217);
+  --tw-bg-opacity: 1;
+  background-color: rgb(44 48 217);
 }
 
 .hovertext:hover {
   color: #dfdfdf !important;
 }
-.wid{
+
+.wid {
   width: 100%;
 }
-.h-style{
 
-      padding: 13px;
-    border-radius: 32px;
+.h-style {
+  padding: 13px;
+  border-radius: 32px;
 }
+
 .bg-white {
-    border-radius: 18px;
+  border-radius: 18px;
+  color: black; /* Ensure text inside white backgrounds is black */
+  background: white; /* Explicitly set the background */
 }
