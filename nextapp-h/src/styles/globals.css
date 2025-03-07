@@ -7,16 +7,11 @@
   --foreground: #171717; /* Dark text for readability */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #171717;
-    --foreground: #ededed;
-  }
-}
+
 
 body {
-  color: var(--foreground);
-  background: var(--background); /* Use the variable for consistency */
+  color: black;
+  background: white; /* Use the variable for consistency */
   font-family: Arial, Helvetica, sans-serif;
 }
 
