@@ -29,7 +29,8 @@
     "framer-motion": "beta",
     "axios": "^1.4.0",
     "react-syntax-highlighter": "^15.5.0",
-"@heroui/react": "latest"
+"@heroui/react": "latest",
+"@nextui-org/react":"latest"
   },
   "devDependencies": {
     "postcss": "^8",
