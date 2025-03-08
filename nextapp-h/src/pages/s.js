@@ -1,5 +1,5 @@
 "use client"; // Needed for useState in Next.js
-
+import {DateRangePicker} from "@heroui/react";
 import { useState } from "react";
 import { Calendar } from "react-date-range"; // Calendar
 import "react-date-range/dist/styles.css"; // Calendar styles
@@ -30,7 +30,9 @@ export default function FilterSection() {
 
   {/* First Row - Search Filters */}
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-    
+    <div className="w-full max-w-xl flex flex-row gap-4">
+      <DateRangePicker showMonthAndYearPickers label="Birth Date" variant="bordered" />
+    </div>
   </div>
 
   {/* Second Row - Dropdowns & Filters */}
