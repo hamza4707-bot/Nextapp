@@ -1,9 +1,7 @@
-"use client"; // Needed for useState in Next.js
+
 import {DateRangePicker} from "@heroui/react";
 import { useState } from "react";
-import { Calendar } from "react-date-range"; // Calendar
-import "react-date-range/dist/styles.css"; // Calendar styles
-import "react-date-range/dist/theme/default.css"; // Default theme
+
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@heroui/react";
 
 export default function FilterSection() {
