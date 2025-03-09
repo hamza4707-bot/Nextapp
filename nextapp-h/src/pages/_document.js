@@ -1,3 +1,3 @@
-export default function Documents() {
+export default function Document() {
     return <div></div>; // Empty page
 }
