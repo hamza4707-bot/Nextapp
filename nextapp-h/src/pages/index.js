@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationArrow } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
