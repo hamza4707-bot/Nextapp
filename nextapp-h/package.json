@@ -19,6 +19,7 @@
     "react-icons": "^5.4.0",
     "@fortawesome/react-fontawesome": "^0.1.17",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
+"@netlify/plugin-nextjs": "^4.39.0",
     "@mui/material": "^5.0.0",
     "@mui/icons-material": "^5.0.0",
     "@emotion/react": "^11.10.0",
